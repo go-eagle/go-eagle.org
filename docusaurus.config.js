@@ -120,16 +120,16 @@ module.exports = {
       },
     ],
   ],
-  i18n: {
-    defaultLocale: 'zh',
-    locales: ['zh', 'en'],
-    localeConfigs: {
-      zh: {
-        label: '中文',
-      },
-      en: {
-        label: 'English',
-      },
-    },
-  },
+  // i18n: {
+  //   defaultLocale: 'zh',
+  //   locales: ['zh', 'en'],
+  //   localeConfigs: {
+  //     zh: {
+  //       label: '中文',
+  //     },
+  //     en: {
+  //       label: 'English',
+  //     },
+  //   },
+  // },
 };
