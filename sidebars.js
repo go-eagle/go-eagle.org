@@ -25,7 +25,16 @@ module.exports = {
       label: '快速开始',
       collapsed: false,
       items: [
-        'intro',
+        'intro/overview',
+      ],
+    },
+    {
+      type: 'category',
+      label: '开源社区',
+      collapsed: false,
+      items: [
+        'community/contribution',
+        'community/documentation',
       ],
     },
   ],
