@@ -1,1 +1,0 @@
-"use strict";(self.webpackChunkgo_eagle_org_2=self.webpackChunkgo_eagle_org_2||[]).push([[535],{5641:function(e){e.exports=JSON.parse('{"title":"Recent posts","items":[{"title":"Welcome","permalink":"/go-eagle.org/blog/welcome"},{"title":"Hello","permalink":"/go-eagle.org/blog/hello-world"},{"title":"Hola","permalink":"/go-eagle.org/blog/hola"}]}')}}]);
