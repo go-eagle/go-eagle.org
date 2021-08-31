@@ -10,22 +10,16 @@
  */
 
 module.exports = {
-  /*
-  tutorialSidebar: [
-    {
-      type: 'category',
-      label: 'Tutorial',
-      items: ['hello'],
-    },
-  ],
-   */
   docs: [
     {
       type: 'category',
       label: '快速开始',
       collapsed: false,
       items: [
-        'intro/overview',
+        'getting-started/overview',
+        'getting-started/start',
+        'getting-started/layout',
+        'getting-started/faq',
       ],
     },
     {
