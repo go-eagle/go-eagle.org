@@ -5,13 +5,14 @@ const darkCodeTheme = require('prism-react-renderer/themes/dracula');
 module.exports = {
   title: 'Eagle',
   tagline: 'a go framework',
-  url: 'https://go-eagle.org',
+  url: 'https://go-eagle.github.io',
   baseUrl: '/',
   onBrokenLinks: 'throw',
   onBrokenMarkdownLinks: 'warn',
   favicon: 'img/favicon.ico',
   organizationName: 'go-eagle', // Usually your GitHub org/user name.
   projectName: 'go-eagle.org', // Usually your repo name.
+  trailingSlash: false,
   themeConfig: {
     navbar: {
       title: 'Eagle',
