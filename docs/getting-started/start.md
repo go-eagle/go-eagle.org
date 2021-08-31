@@ -9,7 +9,7 @@ keywords:
   - Framework
   - Microservices
   - HTTP
-slug: /
+slug: /start
 ---
 
 ## 环境准备

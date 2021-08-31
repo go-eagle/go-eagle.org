@@ -9,7 +9,7 @@ keywords:
   - Framework
   - Microservices
   - HTTP
-slug: /
+slug: /faq
 ---
 
 # 常见问题
