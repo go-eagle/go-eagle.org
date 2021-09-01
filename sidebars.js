@@ -34,7 +34,7 @@ module.exports = {
         {
           type: 'category',
           label: '中间件',
-          collapsed: false,
+          collapsed: true,
           items: [
             'component/middleware/overview',
             'component/middleware/logging',
@@ -44,8 +44,8 @@ module.exports = {
         },
         {
           type: 'category',
-          label: '中间件',
-          collapsed: false,
+          label: '传输协议',
+          collapsed: true,
           items: [
             'component/transport/overview',
             'component/transport/http',
