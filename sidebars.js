@@ -24,6 +24,24 @@ module.exports = {
     },
     {
       type: 'category',
+      label: '核心组件',
+      collapsed: false,
+      items: [
+        'component/config',
+        'component/errors',
+        'component/log',
+        'component/metrics',
+        'component/middleware/overview',
+        'component/middleware/logging',
+        'component/middleware/metrics',
+        'component/middleware/tracing',
+        'component/transport/overview',
+        'component/transport/http',
+        'component/transport/grpc',
+      ],
+    },
+    {
+      type: 'category',
       label: '开源社区',
       collapsed: false,
       items: [
