@@ -4,8 +4,8 @@ const darkCodeTheme = require('prism-react-renderer/themes/dracula');
 /** @type {import('@docusaurus/types').DocusaurusConfig} */
 module.exports = {
   title: 'Eagle',
-  tagline: 'a go framework',
-  url: 'https://go-eagle.github.io',
+  tagline: 'A Go framework for microservice',
+  url: 'https://go-eagle.org',
   baseUrl: '/',
   onBrokenLinks: 'throw',
   onBrokenMarkdownLinks: 'warn',
