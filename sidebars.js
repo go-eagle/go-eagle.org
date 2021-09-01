@@ -28,9 +28,10 @@ module.exports = {
       collapsed: false,
       items: [
         'component/config',
-        'component/errors',
         'component/log',
+        'component/errors',
         'component/metrics',
+        'component/cache',
         {
           type: 'category',
           label: '中间件',
