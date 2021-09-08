@@ -33,7 +33,7 @@ slug: /component/tracing
 
 我们先看看 `OpenTelemetry` 的架构图，我们这里不会完整介绍，只会介绍其中大家常用的几个概念。关于 `OpenTelemetry` 的内部技术架构设计介绍，可以参考 `OpenTelemetry` 架构 ，关于语义约定请参考：[https://github.com/open-telemetry/opentelemetry-specification/blob/main/specification/trace/api.md](https://github.com/open-telemetry/opentelemetry-specification/blob/main/specification/trace/api.md)
 
-![opentelemetry_arch](/static/images/opentelemetry_arch.png)
+![opentelemetry_arch](/images/opentelemetry_arch.png)
 
 ### TracerProvider
 
