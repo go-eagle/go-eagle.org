@@ -9,7 +9,7 @@ keywords:
   - Framework
   - Microservices
   - HTTP
-slug: /component/tracing
+slug: /component/tracing/overview
 ---
 
 
@@ -29,7 +29,7 @@ slug: /component/tracing
 [https://github.com/open-telemetry/opentelemetry-go-contrib](https://github.com/open-telemetry/opentelemetry-go-contrib)
 其他第三方的框架和系统（如Jaeger/Prometheus/Grafana等）也会按照标准化的规范来对接 `OpenTelemetry`，使得系统的开发和维护成本大大降低。
 
-## 相关概念
+## 核心概念
 
 我们先看看 `OpenTelemetry` 的架构图，我们这里不会完整介绍，只会介绍其中大家常用的几个概念。关于 `OpenTelemetry` 的内部技术架构设计介绍，可以参考 `OpenTelemetry` 架构 ，关于语义约定请参考：[https://github.com/open-telemetry/opentelemetry-specification/blob/main/specification/trace/api.md](https://github.com/open-telemetry/opentelemetry-specification/blob/main/specification/trace/api.md)
 
@@ -201,34 +201,3 @@ func InitTracerProvider(serviceName, endpoint string, options ...Option) (*trace
 	return tp, nil
 }
 ```
-
-
-
-
-## 支持的组件
-
-`Tracing` 的实施属于架构层面的事情，仅仅靠修改一两个组件是无法成效的，而是必须在统一开发框架前提下，需要一整套框架联动的事情。在 `Eagle` 开发框架层面，对接的是 `OpenTelemetry` 的 `Go API` 接口，由于 `OpenTelemetry` 的 `Go API` 只是标准协议的接口层，并无具体的业务逻辑实现，因此在没有实例化注入具体的 `TracerProvider` 的情况下，不会对执行性能造成影响。`Eagle` 大部分组件会自动检测是否开启 `Tracing`，没有开启Tracing特性的情况下组件什么都不会做。部分组件需要开发者手动注入 `Tracing` 拦截器来启用 `Tracing` 特性（如 `HTTP` 请求拦截器）。
-
-### HTTP Client
-
-
-
-### HTTP Server
-
-`HTTP` 服务端通过提供可选择的拦截器/中间件的形式注入和启用 `Tracing` 特性。
-
-中间件方式,通过 `Use` 方法设置服务端中间件即可：
-```
-  g := gin.New()
-	g.Use(middleware.Tracing("eagle-service"))
-```
-
-
-### 日志
-
-### 数据库
-
-### Redis
-
-### 自定义函数
-

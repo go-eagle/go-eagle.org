@@ -34,6 +34,15 @@ module.exports = {
         'component/cache',
         {
           type: 'category',
+          label: '链路追踪',
+          collapsed: true,
+          items: [
+            'component/tracing/overview',
+            'component/tracing/component',
+          ],
+        },
+        {
+          type: 'category',
           label: '中间件',
           collapsed: true,
           items: [
