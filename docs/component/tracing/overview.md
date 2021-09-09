@@ -23,9 +23,10 @@ slug: /component/tracing/overview
 
  - OpenTracing介绍
  - OpenTelemetry介绍
+
 因此，我们的Tracing技术方案以 `OpenTelemetry` 为实施标准，协议标准的一些Golang实现开源项目：
 
-[https://github.com/open-telemetry/opentelemetry-go](https://github.com/open-telemetry/opentelemetry-go)
+[https://github.com/open-telemetry/opentelemetry-go](https://github.com/open-telemetry/opentelemetry-go)  
 [https://github.com/open-telemetry/opentelemetry-go-contrib](https://github.com/open-telemetry/opentelemetry-go-contrib)
 其他第三方的框架和系统（如Jaeger/Prometheus/Grafana等）也会按照标准化的规范来对接 `OpenTelemetry`，使得系统的开发和维护成本大大降低。
 
