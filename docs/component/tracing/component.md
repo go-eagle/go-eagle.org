@@ -1,6 +1,6 @@
 ---
 id: component
-title: 支持的组件
+title: 组件
 description: Eagle 一套轻量级 Go 微服务框架，包含大量微服务相关框架及工具
 keywords:
   - Go
@@ -19,16 +19,18 @@ slug: /component/tracing/component
 
 ### HTTP Client
 
+启用 `Tracing` 功能后，`HTTP` 客户端会自动注入，用户无需关心具体细节
 
+使用方式和原来保持不变
 
 ### HTTP Server
 
 `HTTP` 服务端通过提供可选择的拦截器/中间件的形式注入和启用 `Tracing` 特性。
 
 中间件方式,通过 `Use` 方法设置服务端中间件即可：
-```
+```go
   g := gin.New()
-	g.Use(middleware.Tracing("eagle-service"))
+  g.Use(middleware.Tracing("eagle-service"))
 ```
 
 
