@@ -17,9 +17,9 @@ keywords:
 
 ## 环境准备
 
-- go
+- Go
 
-建议开启GO111MODULE
+开启GO111MODULE
 ```bash
 go env -w GO111MODULE=on
 ```
@@ -33,12 +33,12 @@ go env -w GOPROXY="https://goproxy.cn,direct"
 
 安装 eagle 命令行工具
 
-go get 方式安装
+### go get 方式安装
 ```bash
 go get -v github.com/go-eagle/eagle/cmd/eagle
 ```
 
-go install 方式安装
+### go install 方式安装
 ```bash
 go install github.com/go-eagle/eagle/cmd/eagle
 ```
@@ -46,10 +46,8 @@ go install github.com/go-eagle/eagle/cmd/eagle
 ## 创建项目
 
 ```bash
-# 使用
+// 创建新项目
 eagle new eagle-demo 
-# 或者 
-eagle new github.com/foo/bar
 ```
 
 ## 编译和运行
