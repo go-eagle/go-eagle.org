@@ -23,16 +23,19 @@ type Lock interface {
 }
 ```
 
-## 实现
+## Redis实现方式
 
 目前默认支持redis实现的分布式锁，为了防止出现死锁的情况，加入了超时参数， `Unlock` 时使用Lua脚本实现了原子性操作。
 
-## 使用方式
+### 使用方式
 
 ```go
 // github.com/go-eagle/eagle/pkg/lock/redis.go
 
 // 实例化锁
+// 不带超时时间，默认2s
+lock := NewLock(redis.RedisClient, "test:lock")
+// 自定义超时时间
 lock := NewLock(redis.RedisClient, "test:lock", WithTimeout(3*time.Second))
 
 // 加锁
@@ -47,4 +50,8 @@ if err != nil {
     // 处理错误
 }
 ```
+
+## Etcd实现方式
+
+### 使用方式
 
