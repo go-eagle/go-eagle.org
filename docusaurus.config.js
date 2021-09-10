@@ -14,6 +14,7 @@ module.exports = {
   projectName: 'go-eagle.org', // Usually your repo name.
   trailingSlash: false,
   themeConfig: {
+    hideableSidebar: true,
     navbar: {
       title: 'Eagle',
       logo: {
