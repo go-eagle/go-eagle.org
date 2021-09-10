@@ -11,4 +11,62 @@ keywords:
   - HTTP
 ---
 
+## 版本要求
+
+需要使用 eagle v1.3.0 以上版本
+
 ## 环境准备
+
+- go
+
+建议开启GO111MODULE
+```bash
+go env -w GO111MODULE=on
+```
+
+国内用户可以配置[代理](https://goproxy.cn/)，加速下载
+```bash
+go env -w GOPROXY="https://goproxy.cn,direct"
+```
+
+## 安装脚手架
+
+安装 eagle 命令行工具
+
+go get 方式安装
+```bash
+go get -v github.com/go-eagle/eagle/cmd/eagle
+```
+
+go install 方式安装
+```bash
+go install github.com/go-eagle/eagle/cmd/eagle
+```
+
+## 创建项目
+
+```bash
+# 使用
+eagle new eagle-demo 
+# 或者 
+eagle new github.com/foo/bar
+```
+
+## 编译和运行
+
+```bash
+make build
+./eagle-demo -c config/config.local.yaml
+```
+
+## 测试接口
+
+```bash
+curl 'http://127.0.0.1:8080/health'
+
+输出：
+{
+    "status":"UP",
+    "hostname":"host01"
+}
+```
