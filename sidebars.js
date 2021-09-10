@@ -32,6 +32,7 @@ module.exports = {
         'component/errors',
         'component/metrics',
         'component/cache',
+        'component/distributed-lock',
         {
           type: 'category',
           label: '链路追踪',
