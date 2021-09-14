@@ -27,6 +27,11 @@ go env -w GO111MODULE=on
 国内用户可以配置[代理](https://goproxy.cn/)，加速下载
 ```bash
 go env -w GOPROXY="https://goproxy.cn,direct"
+
+// 或者
+$ echo "export GO111MODULE=on" >> ~/.profile
+$ echo "export GOPROXY=https://goproxy.cn" >> ~/.profile
+$ source ~/.profile
 ```
 
 ## 安装脚手架
