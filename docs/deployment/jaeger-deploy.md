@@ -197,3 +197,7 @@ kubectl apply -f jaeger-prod.yaml
 ```yaml
 
 ```
+
+## Reference
+
+- https://www.jaegertracing.io/docs/1.26/deployment/
