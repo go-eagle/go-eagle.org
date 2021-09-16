@@ -31,7 +31,7 @@ Jaeger 既可以部署为一体式二进制文件 (ALL IN ONE)，其中所有 Ja
 
 主要是偏重使用 `all-in-one` 方式
 
-### docker
+### docker 部署
 
 ```bash
 docker run -d --name jaeger \
@@ -47,7 +47,7 @@ docker run -d --name jaeger \
   jaegertracing/all-in-one:latest
 ```
 
-### k8s Jaeger Operator方式
+### k8s方式（Jaeger Operator）
 
 ```yaml
 apiVersion: jaegertracing.io/v1
@@ -75,7 +75,7 @@ spec:
 
 ## 测试环境部署
 
-docker-compose方式
+docker-compose部署
 
 ```yaml
 version: "3"
@@ -116,7 +116,7 @@ services:
     environment:
       - SPAN_STORAGE_TYPE=kafka
       - KAFKA_PRODUCER_BROKERS=10.10.10.10:19092
-      - KAFKA_PRODUCER_TOPIC=jaeger_span_test
+      - KAFKA_PRODUCER_TOPIC=tracing_jaeger_span_test
       - LOG_LEVEL=debug
 
     networks:
@@ -162,7 +162,7 @@ services:
       - LOG_LEVEL=debug
     networks:
       - jaeger
-    entrypoint: ["/go/bin/ingester-linux", '--kafka.consumer.brokers=10.10.10.10:19092', '--kafka.consumer.topic=jaeger_span_test']
+    entrypoint: ["/go/bin/ingester-linux", '--kafka.consumer.brokers=10.10.10.10:19092', '--kafka.consumer.topic=tracing_jaeger_span_test']
 
 networks:
   jaeger:
@@ -170,7 +170,7 @@ networks:
 
 ## 线上环境部署
 
-k8s Jaeger Operator方式
+k8s部署(Jaeger Operator)
 
 部署 operator
 ```bash
@@ -194,8 +194,77 @@ kubectl apply -f jaeger-prod.yaml
 ```
 
 `jaeger-prod.yaml` 内容如下
-```yaml
 
+```yaml
+apiVersion: jaegertracing.io/v1
+kind: Jaeger
+metadata:
+  name: tracing-jaeger-prod
+spec:
+  strategy: streaming #strategy: streaming
+  storage:
+    type: elasticsearch
+    options:
+      es:
+        server-urls: http://elasticsearch:9200
+        username: ES_JAEGER_USER
+        password: PASSWORD
+        use-aliases: true
+        index-prefix: tracing-jaeger
+    # 当 use-aliases 为 true 时，
+    # 会开启两个 cronjob: esRollover esLookback 
+    esIndexCleaner:
+      enabled: true
+      numberOfDays: 7
+      schedule: "55 23 * * *"
+    esRollover:
+      enabled: true
+      conditions: "{\"max_age\": \"1d\"}"
+      readTTL: 168h
+      schedule: "55 23 * * *"
+    # spark
+    dependencies:
+      enabled: true
+      schedule: "55 23 * * *"
+      sparkMaster:
+      resources:
+        requests:
+          memory: 4096Mi
+        limits:
+          memory: 4096Mi
+ 
+  collector:
+    maxReplicas: 3
+    resources:
+      limits:
+        cpu: 100m
+        memory: 128Mi
+    options:
+      kafka:
+        producer:
+          # 检查 kafka配置 auto.create.topics.enable 是否为true, 如果为false需要手动新建topic，否则会报错
+          topic: tracing-jaeger-spans
+          # 具体的kafka ip
+          brokers: kafka1:9092,kafka2:9092,kafka3:9092 
+ 
+  ingester:
+    maxReplicas: 3
+    resources:
+      limits:
+        cpu: 100m
+        memory: 128Mi
+    options:
+      kafka:
+        consumer:
+          topic: tracing-jaeger-spans
+          brokers: kafka1:9092,kafka2:9092,kafka3:9092 
+      # ingester:
+      #   deadlockInterval: 0s
+  ui:
+    options:
+      dependencies:
+        menuEnabled: true
+      menu: []
 ```
 
 ## Reference
