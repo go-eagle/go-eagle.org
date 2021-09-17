@@ -28,7 +28,7 @@ module.exports = {
       collapsed: false,
       items: [
         'component/config',
-        'component/log',
+        'component/logging',
         'component/errors',
         'component/metrics',
         'component/cache',
@@ -63,6 +63,15 @@ module.exports = {
             'component/transport/grpc',
           ],
         },
+      ],
+    },
+    {
+      type: 'category',
+      label: '环境部署',
+      collapsed: false,
+      items: [
+        'deployment/jaeger-deploy',
+        'deployment/app-deploy',
       ],
     },
     {

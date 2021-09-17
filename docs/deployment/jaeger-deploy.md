@@ -9,14 +9,14 @@ keywords:
   - Framework
   - Microservices
   - HTTP
-slug: /component/cache
+slug: /deployment/jaeger-deploy
 ---
 
 ## Jaeger架构
 
 Jaeger 既可以部署为一体式二进制文件 (ALL IN ONE)，其中所有 Jaeger 后端组件都运行在单个进程中，也可以部署为可扩展的分布式系统 (高可用架构)
 
-![jaeger-arch](/images/jaeger-arch.png)
+![jaeger-arch](/images/jaeger-arch.jpg)
 
 主要有以下几个组件：
 - Jaeger Client : OpenTracing API 的具体语言实现。它们可以用来为各种现有开源框架提供分布式追踪工具。
@@ -53,7 +53,7 @@ docker run -d --name jaeger \
 apiVersion: jaegertracing.io/v1
 kind: Jaeger
 metadata:
-  name: my-jaeger
+  name: local-jaeger
 spec:
   strategy: allInOne # 部署策略
   allInOne:
@@ -92,11 +92,11 @@ services:
   kafka:
     image: 'bitnami/kafka:latest'
     ports:
-      - '19092:9092'
+      - '9092:9092'
     environment:
       - KAFKA_BROKER_ID=1
       - KAFKA_CFG_LISTENERS=PLAINTEXT://:9092
-      - KAFKA_CFG_ADVERTISED_LISTENERS=PLAINTEXT://10.10.10.10:19092
+      - KAFKA_CFG_ADVERTISED_LISTENERS=PLAINTEXT://10.10.10.10:9092
       - KAFKA_CFG_ZOOKEEPER_CONNECT=zookeeper:2181
       - KAFKA_CFG_OFFSETS_TOPIC_REPLICATION_FACTOR=1
       - ALLOW_PLAINTEXT_LISTENER=yes
@@ -115,7 +115,7 @@ services:
       - '14269:14269'
     environment:
       - SPAN_STORAGE_TYPE=kafka
-      - KAFKA_PRODUCER_BROKERS=10.10.10.10:19092
+      - KAFKA_PRODUCER_BROKERS=kafka:9092
       - KAFKA_PRODUCER_TOPIC=tracing_jaeger_span_test
       - LOG_LEVEL=debug
 
@@ -162,7 +162,7 @@ services:
       - LOG_LEVEL=debug
     networks:
       - jaeger
-    entrypoint: ["/go/bin/ingester-linux", '--kafka.consumer.brokers=10.10.10.10:19092', '--kafka.consumer.topic=tracing_jaeger_span_test']
+    entrypoint: ["/go/bin/ingester-linux", '--kafka.consumer.brokers=kafka:9092', '--kafka.consumer.topic=tracing_jaeger_span_test']
 
 networks:
   jaeger:
@@ -170,12 +170,32 @@ networks:
 
 ## 线上环境部署
 
-k8s部署(Jaeger Operator)
+> 以下均使用k8s方式部署
 
-部署 operator
+### 部署 Jaeger Operator
+
+#### 原生方式
+
+```bash
+kubectl create namespace observability # <1>
+kubectl create -f https://raw.githubusercontent.com/jaegertracing/jaeger-operator/master/deploy/crds/jaegertracing.io_jaegers_crd.yaml # <2>
+kubectl create -n observability -f https://raw.githubusercontent.com/jaegertracing/jaeger-operator/master/deploy/service_account.yaml
+kubectl create -n observability -f https://raw.githubusercontent.com/jaegertracing/jaeger-operator/master/deploy/role.yaml
+kubectl create -n observability -f https://raw.githubusercontent.com/jaegertracing/jaeger-operator/master/deploy/role_binding.yaml
+kubectl create -n observability -f https://raw.githubusercontent.com/jaegertracing/jaeger-operator/master/deploy/operator.yaml
+
+kubectl create -f https://raw.githubusercontent.com/jaegertracing/jaeger-operator/master/deploy/cluster_role.yaml
+kubectl create -f https://raw.githubusercontent.com/jaegertracing/jaeger-operator/master/deploy/cluster_role_binding.yaml
+
+```
+
+#### Helm 方式
+
 ```bash
 helm install jaeger-operator jaegertracing/jaeger-operator --version=2.25.0 -f jaeger-operator-prod.yaml
 ```
+
+jaeger-operator 本身的资源配置
 
 ```yaml
 resources:
@@ -187,7 +207,7 @@ resources:
     memory: 128Mi
 ```
 
-部署 jaeger
+### 部署 jaeger
 
 ```bash
 kubectl apply -f jaeger-prod.yaml
@@ -201,7 +221,7 @@ kind: Jaeger
 metadata:
   name: tracing-jaeger-prod
 spec:
-  strategy: streaming #strategy: streaming
+  strategy: streaming
   storage:
     type: elasticsearch
     options:
@@ -211,12 +231,13 @@ spec:
         password: PASSWORD
         use-aliases: true
         index-prefix: tracing-jaeger
-    # 当 use-aliases 为 true 时，
-    # 会开启两个 cronjob: esRollover esLookback 
+    # 当 use-aliases 为 true, 会开启两个cronjob: esRollover esLookback
+    # cronjob
     esIndexCleaner:
       enabled: true
       numberOfDays: 7
       schedule: "55 23 * * *"
+    # cronjob
     esRollover:
       enabled: true
       conditions: "{\"max_age\": \"1d\"}"
@@ -232,32 +253,41 @@ spec:
           memory: 4096Mi
         limits:
           memory: 4096Mi
- 
+
+  agent:
+    resources:
+      limits:
+        cpu: 100m
+        memory: 128Mi
+      requests:
+        cpu: 100m
+        memory: 128Mi
+
   collector:
     maxReplicas: 3
     resources:
       limits:
-        cpu: 100m
-        memory: 128Mi
+        cpu: 200m
+        memory: 256Mi
     options:
       kafka:
         producer:
-          # 检查 kafka配置 auto.create.topics.enable 是否为true, 如果为false需要手动新建topic，否则会报错
+          # 检查 kafka配置 auto.create.topics.enable 是否为true
+          # 如果为false 需要手动新建topic，否则会报错
           topic: tracing-jaeger-spans
-          # 具体的kafka ip
-          brokers: kafka1:9092,kafka2:9092,kafka3:9092 
- 
+          brokers: kafka1:9092,kafka2:9092,kafka3:9092
+
   ingester:
     maxReplicas: 3
     resources:
       limits:
-        cpu: 100m
-        memory: 128Mi
+        cpu: 300m
+        memory: 512Mi
     options:
       kafka:
         consumer:
           topic: tracing-jaeger-spans
-          brokers: kafka1:9092,kafka2:9092,kafka3:9092 
+          brokers: kafka1:9092,kafka2:9092,kafka3:9092
       # ingester:
       #   deadlockInterval: 0s
   ui:
