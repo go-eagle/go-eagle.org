@@ -21,13 +21,14 @@ slug: /component/tracing/overview
 
 分布式链路跟踪（ `Distributed Tracing` ）的概念最早是由`Google`提出来的，发展至今技术已经比较成熟，也是有一些协议标准可以参考。目前在`Tracing`技术这块比较有影响力的是两大开源技术框架：Netflix公司开源的`OpenTracing`和Google开源的`OpenCensus`。两大框架都拥有比较高的开发者群体。为形成统一的技术标准，两大框架最终磨合成立了`OpenTelemetry`项目，简称`otel`。具体可以参考：
 
- - OpenTracing介绍
- - OpenTelemetry介绍
+ - [OpenTracing介绍](https://opentracing.io/)
+ - [OpenTelemetry介绍](https://opentelemetry.io/)
 
 因此，我们的Tracing技术方案以 `OpenTelemetry` 为实施标准，协议标准的一些Golang实现开源项目：
 
 [https://github.com/open-telemetry/opentelemetry-go](https://github.com/open-telemetry/opentelemetry-go)  
 [https://github.com/open-telemetry/opentelemetry-go-contrib](https://github.com/open-telemetry/opentelemetry-go-contrib)
+
 其他第三方的框架和系统（如Jaeger/Prometheus/Grafana等）也会按照标准化的规范来对接 `OpenTelemetry`，使得系统的开发和维护成本大大降低。
 
 ## 核心概念
@@ -52,8 +53,10 @@ func InitTracerProvider(serviceName, endpoint string, options ...Option) (*trace
 		return nil, errors.New("no service name provided")
 	}
 	if strings.HasPrefix(endpoint, "http") {
+		// http to collector
 		endpointOption = jaeger.WithCollectorEndpoint(jaeger.WithEndpoint(endpoint))
 	} else {
+		// udp to agent
 		endpointOption = jaeger.WithAgentEndpoint(jaeger.WithAgentHost(endpoint))
 	}
 
@@ -207,7 +210,7 @@ func InitTracerProvider(serviceName, endpoint string, options ...Option) (*trace
 	)
 
 	otel.SetTracerProvider(tp)
-  // 全局设置
+	// 全局设置
 	otel.SetTextMapPropagator(jaegerprop.Jaeger{})
 
 	return tp, nil
