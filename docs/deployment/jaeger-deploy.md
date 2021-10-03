@@ -195,7 +195,7 @@ kubectl create -f https://raw.githubusercontent.com/jaegertracing/jaeger-operato
 helm install jaeger-operator jaegertracing/jaeger-operator --version=2.25.0 -f jaeger-operator-prod.yaml
 ```
 
-jaeger-operator 本身的资源配置
+jaeger-operator-prod 本身的资源配置
 
 ```yaml
 resources:
@@ -239,9 +239,8 @@ spec:
       schedule: "55 23 * * *"
     # cronjob
     esRollover:
-      enabled: true
       conditions: "{\"max_age\": \"1d\"}"
-      readTTL: 168h
+      readTTL: 120h
       schedule: "55 23 * * *"
     # spark
     dependencies:
@@ -288,13 +287,9 @@ spec:
         consumer:
           topic: tracing-jaeger-spans
           brokers: kafka1:9092,kafka2:9092,kafka3:9092
-      # ingester:
-      #   deadlockInterval: 0s
-  ui:
-    options:
-      dependencies:
-        menuEnabled: true
-      menu: []
+      # 消费者协程数，默认1000
+      numRoutines: 1000
+
 ```
 
 ## Reference
