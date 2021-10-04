@@ -47,7 +47,7 @@ logger:
   LoggerFile: /tmp/log/eagle.log           # 所有level的日志文件
   LoggerWarnFile: /tmp/log/eagle.wf.log    # 仅记录warn的日志文件
   LoggerErrorFile: /tmp/log/eagle.err.log  # 仅记录error的日志文件
-  LogRollingPolicy: daily   # 日志切割方式，默认按天进行切割
+  LogRollingPolicy: daily   # 日志切割方式: daily/hourly，默认按天(daily)进行切割
   LogBackupCount: 7         # 日志备份数
 ```
 
