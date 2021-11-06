@@ -36,7 +36,7 @@ type Logger interface {
 ## 日志配置
 
 ```yaml
-logger:
+# config/logger.yaml
   Development: false
   DisableCaller: false
   DisableStacktrace: false
@@ -63,15 +63,12 @@ logger:
 在 `main.go` 启动时会初始化日志, 之后可全局使用。
 
 ```go
-var (
-  cfgFile = pflag.StringP("config", "c", "", "eagle config file path.")
-)
-cfg, err := conf.Init(*cfgFile)
-if err != nil {
-  panic(err)
-}
+// main.go
+...
 
-logger.Init(&cfg.Logger)
+logger.Init()
+
+...
 ```
 
 ## 使用方式

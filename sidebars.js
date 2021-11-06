@@ -34,6 +34,7 @@ module.exports = {
         'component/metrics',
         'component/cache',
         'component/distributed-lock',
+        'component/queue',
         {
           type: 'category',
           label: '链路追踪',

@@ -12,31 +12,110 @@ keywords:
 slug: /component/config
 ---
 
-## 文件位置
+## 概览
 
-配置默认使用 `yaml` 格式，存放于项目根目录下的 `config` 目录下。
-
-默认的配置文件名为 `config.yaml`, 各种环境的配置文件可以分开保存，如
+配置管理是框架必不可少的一部分，像数据库、redis、消息队列等都会依赖配置进行初始化。  
+Eagle 框架支持 `单独模式` 和 `分环境` 的配置模式；同时也支持不同的配置格式，
+目前包括的有：
 
 ```bash
-# 本地环境
-config/config.local.yaml
+yaml
+toml
+ini
+json
+hcl
+dotenv
+env
+```
+
+## 文件位置
+
+配置默认使用 `yaml` 格式，存放于项目根目录的 `config` 目录下。
+
+配置文件根据不同功能分开存放，方便扩展，具体如下：
+
+```bash
+.
+├── README.md
+├── app.yaml
+├── database.yaml
+├── logger.yaml
+├── redis.yaml
+└── trace.yaml
+
+```
+
+## 配置模式
+
+### 单独配置模式
+
+单独配置主要是只所有的配置文件都分开的保存在 `config` 目录下，如下：
+
+> 适合于不需要区分环境的场景
+
+```bash
+├── config
+│   ├── README.md
+│   ├── app.yaml
+│   ├── database.yaml
+│   ├── logger.yaml
+│   ├── redis.yaml
+│   └── trace.yaml
+```
+
+### 分环境配置模式
+
+我们一般的环境有开发(dev)、测试(test)、线上(prod)环境，不同的环境可以对应不同的配置文件，如下：
+
+```bash
+# 开发环境
+├── config
+│   ├── dev
+│   │   ├── README.md
+│   │   ├── app.yaml
+│   │   ├── database.yaml
+│   │   ├── logger.yaml
+│   │   ├── redis.yaml
+│   │   └── trace.yaml
 
 # 测试环境
-config/config.test.yaml
+├── config
+│   ├── test
+│   │   ├── README.md
+│   │   ├── app.yaml
+│   │   ├── database.yaml
+│   │   ├── logger.yaml
+│   │   ├── redis.yaml
+│   │   └── trace.yaml
 
 # 线上环境
-config/config.prod.yaml
+├── config
+│   ├── prod
+│   │   ├── README.md
+│   │   ├── app.yaml
+│   │   ├── database.yaml
+│   │   ├── logger.yaml
+│   │   ├── redis.yaml
+│   │   └── trace.yaml
 ```
 
 ## 加载配置
 
-在项目启动的时候，通过参数 `-c` 加载配置，并存入全局变量 `Conf` 中。
+在项目启动的时候，可以通过参数来指定配置目录和运行环境，参数说明：
+
+- `-c` 配置目录
+- `-e` 环境变量
 
 ```bash
 go build
 
-./eagle -c config/config.local.yaml
+# 单独配置启动模式
+./eagle -c config
+
+# 分环境配置启动模式
+./eagle -c config -e dev
+# 或者
+APP_ENV=dev ./eagle -c config
 ```
 
 ## 读取配置
@@ -45,33 +124,58 @@ go build
 
 ```go
 // main.go
-
 var (
-  cfgFile = pflag.StringP("config", "c", "", "eagle config file path.")
+  cfgDir = pflag.StringP("config", "c", "config", "config file path.")
+  env    = pflag.StringP("env name", "e", "dev", "env var name.")
   ...
 )
 
 ...
 
 // 初始化配置
-cfg, err := conf.Init(*cfgFile)
-if err != nil {
+c := config.New(
+  config.WithEnv(*env),
+  config.WithConfigDir(*cfgDir),
+)
+var cfg config.AppConfig
+if err := c.Scan("app", &cfg); err != nil {
   panic(err)
 }
 
 // 读取某一项配置
-name := conf.Conf.App.Name
+name := cfg.Name
 ```
 
-## 热加载
+> 应用的配置config.WithEnv(*env) 优先级高于环境变量的 APP_ENV 配置
 
-当配置文件发生变更的时候，对应的配置会进行热更新，应用本生无需重启。
 
 ## 加载自定义配置
 
-如果有一个自己的配置文件，加载方式如下：
+如果有一个自己的配置文件，以加载 `redis` 配置文件为例，根据配置文件类型的不同有两种加载方式
+
+### 默认加载方式(yaml)
 
 ```go
-// 待补充
+type Config struct {
+  Addr              string
+  Password          string
+}
+var cfg Config
+// config/redis.yaml
+if err := config.Conf.Scan("redis", &cfg); err != nil {
+  // handle error
+}
+fmt.Println(cfg)
+// Output:
+// {127.0.0.1:6379 123456}
+```
 
+### 指定不同的文件格式
+
+```go
+# 加载 json 格式的配置
+v, err := config.Conf.LoadWithType("redis", "json")
+if err != nil {
+  // handle error
+}
 ```
