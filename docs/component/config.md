@@ -126,19 +126,16 @@ APP_ENV=dev ./eagle -c config
 // main.go
 var (
   cfgDir = pflag.StringP("config", "c", "config", "config file path.")
-  env    = pflag.StringP("env name", "e", "dev", "env var name.")
+  env    = pflag.StringP("env name", "e", "", "env var name.")
   ...
 )
 
 ...
 
 // 初始化配置
-c := config.New(
-  config.WithEnv(*env),
-  config.WithConfigDir(*cfgDir),
-)
+c := config.New(*cfgDir, config.WithEnv(*env))
 var cfg config.AppConfig
-if err := c.Scan("app", &cfg); err != nil {
+if err := c.Load("app", &cfg); err != nil {
   panic(err)
 }
 
@@ -146,7 +143,7 @@ if err := c.Scan("app", &cfg); err != nil {
 name := cfg.Name
 ```
 
-> 应用的配置config.WithEnv(*env) 优先级高于环境变量的 APP_ENV 配置
+> 应用的配置 config.WithEnv(*env) 优先级高于环境变量的 APP_ENV 配置
 
 
 ## 加载自定义配置
@@ -162,7 +159,7 @@ type Config struct {
 }
 var cfg Config
 // config/redis.yaml
-if err := config.Conf.Scan("redis", &cfg); err != nil {
+if err := config.Load("redis", &cfg); err != nil {
   // handle error
 }
 fmt.Println(cfg)
@@ -174,7 +171,7 @@ fmt.Println(cfg)
 
 ```go
 # 加载 json 格式的配置
-v, err := config.Conf.LoadWithType("redis", "json")
+v, err := config.LoadWithType("redis", "json")
 if err != nil {
   // handle error
 }

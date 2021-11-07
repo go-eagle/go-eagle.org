@@ -22,10 +22,11 @@ Eagle 🦅一套轻量级 Go 微服务框架
 ### Features
 
 * Config：支持多种数据格式及热加载；
-* Transport：通用的 HTTP/gRPC 传输层；
+* Transport：通用的 HTTP/gRPC 传输层，一个进程拥有多种协议；
 * Logger：标准日志接口，可方便集成三方 log 库；
 * Metrics：统一指标接口，可以实现各种指标系统，默认集成 Prometheus；
 * Tracing：支持微服务链路追踪，遵循 OpenTelemetry 规范定义；
+* Registry: 支持服务注册与发现；
 * Errors：统一返回错误码格式；
 
 <!-- ### Architecture -->
