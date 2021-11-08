@@ -176,5 +176,5 @@ if err != nil {
   // handle error
 }
 fmt.Println("redis addr: ", conf.GetString("redis.Addr"))
-fmt.Println("redis addr: ", conf.GetInt("redis.MinIdleConn"))
+fmt.Println("redis min idel conn: ", conf.GetInt("redis.MinIdleConn"))
 ```
