@@ -171,8 +171,10 @@ fmt.Println(cfg)
 
 ```go
 # 加载 json 格式的配置
-v, err := config.LoadWithType("redis", "json")
+conf, err := config.LoadWithType("redis", "json")
 if err != nil {
   // handle error
 }
+fmt.Println("redis addr: ", conf.GetString("redis.Addr"))
+fmt.Println("redis addr: ", conf.GetInt("redis.MinIdleConn"))
 ```
