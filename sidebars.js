@@ -72,8 +72,17 @@ module.exports = {
       label: '环境部署',
       collapsed: false,
       items: [
+        'deployment/go-deploy',
         'deployment/jaeger-deploy',
         'deployment/app-deploy',
+      ],
+    },
+    {
+      type: 'category',
+      label: '开发指南',
+      collapsed: false,
+      items: [
+        'guide/api-protobuf',
       ],
     },
     {
