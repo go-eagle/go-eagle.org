@@ -83,6 +83,7 @@ module.exports = {
       collapsed: false,
       items: [
         'guide/api-protobuf',
+        'guide/api-restful',
       ],
     },
     {
