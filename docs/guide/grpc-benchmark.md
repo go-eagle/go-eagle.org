@@ -53,8 +53,8 @@ ghz --insecure \
     --proto ./helloworld/greeter.proto \
     --call helloworld.Greeter/SayHello \
     -d '{"name": "Eagle"}' \
-    -n 10 \
-    -c 5  \
+    -n 10000 \
+    -c 100  \
 	0.0.0.0:9090
 ```
 
@@ -62,37 +62,37 @@ ghz --insecure \
 
 ```bash
 Summary:
-  Count:        10
-  Total:        10.92 ms
-  Slowest:      5.73 ms
-  Fastest:      0.34 ms
-  Average:      2.91 ms
-  Requests/sec: 915.64
+  Count:        10000
+  Total:        949.45 ms
+  Slowest:      44.86 ms
+  Fastest:      0.12 ms
+  Average:      4.36 ms
+  Requests/sec: 10532.46
 
 Response time histogram:
-  0.338 [1] |∎∎∎∎∎∎∎∎∎∎
-  0.877 [4] |∎∎∎∎∎∎∎∎∎∎∎∎∎∎∎∎∎∎∎∎∎∎∎∎∎∎∎∎∎∎∎∎∎∎∎∎∎∎∎∎
-  1.417 [0] |
-  1.957 [0] |
-  2.496 [0] |
-  3.036 [0] |
-  3.575 [0] |
-  4.115 [0] |
-  4.654 [0] |
-  5.194 [2] |∎∎∎∎∎∎∎∎∎∎∎∎∎∎∎∎∎∎∎∎
-  5.733 [3] |∎∎∎∎∎∎∎∎∎∎∎∎∎∎∎∎∎∎∎∎∎∎∎∎∎∎∎∎∎∎
+  0.118  [1]    |
+  4.591  [6064] |∎∎∎∎∎∎∎∎∎∎∎∎∎∎∎∎∎∎∎∎∎∎∎∎∎∎∎∎∎∎∎∎∎∎∎∎∎∎∎∎
+  9.065  [3006] |∎∎∎∎∎∎∎∎∎∎∎∎∎∎∎∎∎∎∎∎
+  13.539 [601]  |∎∎∎∎
+  18.013 [239]  |∎∎
+  22.486 [43]   |
+  26.960 [19]   |
+  31.434 [23]   |
+  35.908 [3]    |
+  40.381 [0]    |
+  44.855 [1]    |
 
 Latency distribution:
-  10 % in 0.34 ms 
-  25 % in 0.37 ms 
-  50 % in 0.39 ms 
-  75 % in 5.54 ms 
-  90 % in 5.70 ms 
-  95 % in 5.73 ms 
-  99 % in 5.73 ms 
+  10 % in 0.67 ms 
+  25 % in 1.46 ms 
+  50 % in 3.38 ms 
+  75 % in 6.20 ms 
+  90 % in 8.80 ms 
+  95 % in 11.56 ms 
+  99 % in 17.54 ms 
 
 Status code distribution:
-  [OK]   10 responses
+  [OK]   10000 responses
 ```
 
 更多example可以查看 https://ghz.sh/docs/examples
@@ -122,8 +122,8 @@ ghz --insecure \
     --proto ./helloworld/greeter.proto \
     --call helloworld.Greeter/SayHello \
     -d '{"name": "Eagle"}' \
-    -n 10 \
-    -c 5  \
+    -n 10000 \
+    -c 100  \
     --tags '{"env": "staging", "created by":"Go Developer"}' \
     --name 'Greeter SayHello' \
     -O json \
