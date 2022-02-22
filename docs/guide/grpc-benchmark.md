@@ -104,11 +104,18 @@ Status code distribution:
 ```bash
 ./dist/ghz-web
 
+# 可以看到web运行在80端口
 ...
 ⇨ http server started on [::]:80
 ...
 ```
-可以看到web运行在 80端口
+
+控制台首页
+![image](https://user-images.githubusercontent.com/3043638/155119046-edd3f5a0-a69d-4edf-8728-57fc73260fd6.png)
+
+新建项目
+
+在web控制台创建一个项目，供下面使用。
 
 ```bash
 ghz --insecure \
@@ -120,12 +127,11 @@ ghz --insecure \
     --tags '{"env": "staging", "created by":"Go Developer"}' \
     --name 'Greeter SayHello' \
     -O json \
-    0.0.0.0:9090 | curl -XPOST "http://localhost:80/api/projects/1/ingest"
+    0.0.0.0:9090 | curl -H "Content-Type:application/json" -XPOST -d @- "http://localhost:80/api/projects/1/ingest"
 ```
 
 之后就可以在控制台查看，效果如下
-
-
+![image](https://user-images.githubusercontent.com/3043638/155119480-b7d55c1a-1471-4b85-80e2-465451cb566f.png)
 
 
 ## Reference
