@@ -40,8 +40,10 @@ cd ghz
 # 这里编译包含 ghz本身和ghz-web
 make build
 
-#
-./dist/ghz -h
+cp ./dist/ghz /usr/local/bin/
+
+# 查看帮助
+ghz -h
 ```
 
 ### 使用
