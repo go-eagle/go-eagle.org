@@ -191,8 +191,20 @@ span.AddEvent("http.request", trace.WithAttributes(
 `Propagator` 传播器用于端对端的数据编码/解码，例如：`Client` 到 `Server` 端的数据传输，`TraceId`、`SpanId`和`Baggage`也是需要通过传播器来管理数据传输。业务端开发者往往对`Propagator`无感知，只有中间件/拦截器的开发者需要知道它的作用。`OpenTelemetry`的标准协议实现库提供了常用的`TextMapPropagator`，用于常见的文本数据端到端传输。此外，为保证`TextMapPropagator`中的传输数据兼容性，不应当带有特殊字符，具体请参考：[https://github.com/open-telemetry/opentelemetry-specification/blob/main/specification/context/api-propagators.md](https://github.com/open-telemetry/opentelemetry-specification/blob/main/specification/context/api-propagators.md)
 
 设置示例
+
+Propagator支持多种格式，比如：jaeger、aws的xray等
+
+jaeger方式  
+
 ```go
 // pkg/trace/tracer.go
+
+import (
+	...
+	jaegerprop "go.opentelemetry.io/contrib/propagators/jaeger"
+	...
+)
+
 func InitTracerProvider(serviceName, endpoint string, options ...Option) (*tracesdk.TracerProvider, error) {
 	...
 
@@ -212,6 +224,46 @@ func InitTracerProvider(serviceName, endpoint string, options ...Option) (*trace
 	otel.SetTracerProvider(tp)
 	// 全局设置
 	otel.SetTextMapPropagator(jaegerprop.Jaeger{})
+
+	return tp, nil
+}
+```
+
+xray方式  
+
+```go
+// pkg/trace/tracer.go
+
+import (
+	...
+	"go.opentelemetry.io/contrib/propagators/aws/xray"
+	...
+)
+
+func InitTracerProvider(serviceName, endpoint string, options ...Option) (*tracesdk.TracerProvider, error) {
+	...
+	
+	// A custom ID Generator to generate traceIDs that conform to
+        // AWS X-Ray traceID format
+        idg := xray.NewIDGenerator()
+
+	opts := applyOptions(options...)
+	tp := tracesdk.NewTracerProvider(
+		// set sample
+		tracesdk.WithSampler(tracesdk.TraceIDRatioBased(opts.SamplingRatio)),
+		// Always be sure to batch in production.
+		tracesdk.WithBatcher(exporter),
+		// Record information about this application in an Resource.
+		tracesdk.WithResource(resource.NewWithAttributes(
+			semconv.SchemaURL,
+			semconv.ServiceNameKey.String(serviceName),
+		)),
+		sdktrace.WithIDGenerator(idg),
+	)
+
+	otel.SetTracerProvider(tp)
+	// 全局设置
+	otel.SetTextMapPropagator(xray.Propagator{})
 
 	return tp, nil
 }
