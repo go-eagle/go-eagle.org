@@ -44,6 +44,9 @@ go get -v github.com/go-eagle/eagle/cmd/eagle
 ```
 
 ### go install 方式安装
+
+> Go 1.16 版本以上使用该方式
+
 ```bash
 go install github.com/go-eagle/eagle/cmd/eagle
 ```

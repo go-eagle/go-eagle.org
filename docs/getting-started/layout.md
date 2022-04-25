@@ -19,7 +19,7 @@ slug: /getting-started/layout
 ```bash
 ├── Makefile                     # 项目管理文件
 ├── README.md                    # 项目说明文件
-├── api                          # grpc客户端和Swagger 文档
+├── api                          # API接口定义，proto源文件及gRPC stub
 ├── cmd                          # 项目启动入口文件
 ├── config                       # 配置文件统一存放目录
 ├── internal                     # 业务目录
@@ -27,15 +27,15 @@ slug: /getting-started/layout
 │   ├── handler                  # http 接口
 │   ├── middleware               # 业务自定义中间件
 │   ├── model                    # 数据库 model
-│   ├── repository               # 数据访问层, eg: 数据库,redis,api等
+│   ├── repository               # 数据访问层, eg: 数据库,redis, 第三发api等
 │   ├── ecode                    # 业务自定义错误码
 │   ├── mock                     # mock 文件，用于单元测试
 │   ├── routers                  # 业务路由
+│   ├── tasks                    # 任务定义和处理，包含即时、延迟和定时任务
 │   ├── server                   # http server 和 grpc server
 │   └── service                  # 业务逻辑层
-├── logs                         # 存放日志的目录
 ├── main.go                      # 项目入口文件
-├── pkg                          # 框架核心目录
+├── pkg                          # 项目公共库目录
 ├── test                         # 单元测试依赖的配置文件，主要是供docker使用的一些环境配置文件
 └── scripts                      # 存放用于执行各种构建，安装，分析等操作的脚本
 ```

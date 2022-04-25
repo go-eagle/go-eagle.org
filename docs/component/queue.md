@@ -18,17 +18,19 @@ slug: /component/queue
 消息队列也是框架的基本标配，实际开发中也基本上离不开消息队列的使用，比如：及时队列、延迟队列、定时队列。  
 使用场景如：
 
-- 新用户注册发送欢迎提醒（及时消息）
+- 新用户注册发送欢迎提醒（即时消息）
 - 网上购物下订单，30分钟内未支付订单会被关闭（延迟消息）
 - 在指定的时间运行任务（定时消息）
 
 在 Eagle 框架中，分为两类消息队列，一种是偏轻量型的消息队列(主要使用redis)，一种重量型一点的消息队列(RabbitMQ或Kafak)，下面详细介绍。
 
-## 轻量型的消息队列
+## 消息队列
 
-这里所谓的轻量主要是对使用底层存储的考量，redis 大家基本都在用，使用和部署都比较简单。
+这里所谓的轻量主要是对使用底层存储的考量，redis 大家基本都在用，使用和部署都比较简单。  
 
-> 主要是对 asynq 做了简单的封装
+:::caution
+主要是对 asynq 做了简单的封装
+:::
 
 ### 架构图
 
@@ -44,9 +46,7 @@ slug: /component/queue
 - 支持redis单机、集群和哨兵模式(Sentinels)
 - 支持 web UI 查看
 
-### 使用
-
-#### 配置
+### 配置
 
 ```yaml
 # config/cron.yaml
@@ -64,18 +64,18 @@ PoolTimeout: 240s
 Concurrency: 10  # 指定worker的数量
 ```
 
-#### 定义task
+### 定义task
 
-task里主要做了4件事情
+task里主要做了以下4件事情
 
-- 1.定义任务类型
-- 2.定义任务payload，即定义任务里需要使用到的数据
-- 3.创建一个task
-- 4.定义一个handle方法，用来编写具体处理任务的逻辑  
+- 定义任务类型  
+- 定义任务payload，即定义任务里需要使用到的数据  
+- 创建一个task  
+- 定义一个handle方法，用来编写具体处理任务的逻辑  
 
 有两种方式，手动和命令行生成
 
-##### 手动编写task
+#### a.手动编写task
 
 ```go
 // internal/tasks/email_welcome.go
@@ -122,18 +122,29 @@ func HandleEmailWelcomeTask(ctx context.Context, t *asynq.Task) error {
 
 ```
 
-##### 命令行生成task
+#### b.命令行生成task
 
 ```bash
+# 生成任务
 eagle task add EmailWelcome
 
-# 查看是否已生成
+# 查看任务列表
 eagle task list
+
+# 输出任务列表
++---+---------------+------------------------+------------------+----------------+
+| # | TASK NAME     | HANDLER NAME           | FILE NAME        | LOCATION       |
++---+---------------+------------------------+------------------+----------------+
+| 1 | email:welcome | HandleEmailWelcomeTask | email_welcome.go | internal/tasks |
++---+---------------+------------------------+------------------+----------------+
+
 ```
 
+:::info
 生成结果和手动编写是一致的。
+:::
 
-#### 注册task
+### 注册task
 
 > 在需要执行task的地方进行注册
 
@@ -144,7 +155,7 @@ if err != nil {
     log.Fatalf("could not create task: %v", err)
 }
 
-// 及时消息
+// 即时消息
 _, err := GetClient().Enqueue(task)
 
 // 延时消息
@@ -160,7 +171,7 @@ _, err := GetClient().Enqueue(task, asynq.MaxRetry(10), asynq.Timeout(3*time.Min
 _, err := GetClient().Enqueue(task, asynq.Queue(QueueCritical))
 ```
 
-#### 注册handle
+### 注册handle
 
 在 main.go 进行注册
 
@@ -173,9 +184,9 @@ _, err := GetClient().Enqueue(task, asynq.Queue(QueueCritical))
     ...
 ```
 
-#### 注册定时任务
+### 注册定时任务
 
-定时任务和其他消息不太一样，直接在main.go里注册即可
+定时任务和其他消息不太一样，直接在 `main.go` 里注册即可
 
 ```go
 scheduler := asynq.NewScheduler(
@@ -184,12 +195,12 @@ scheduler := asynq.NewScheduler(
 )
 
  // 这里进行任务的注册
-// start
+ // start
  t, _ := task.NewEmailWelcomeTask(6)
  if _, err := scheduler.Register("@every 5s", t); err != nil {
     log.Fatal(err)
  }
-  // end
+ // end
 
  // Run blocks and waits for os signal to terminate the program.
  if err := scheduler.Run(); err != nil {
@@ -197,7 +208,7 @@ scheduler := asynq.NewScheduler(
  }
 ```
 
-#### 启动server
+### 启动server
 
 ```go
 go run cmd/cron/main.go
@@ -205,13 +216,13 @@ go run cmd/cron/main.go
 
 OK, 这样task就会按照指定的方式运行了。
 
-#### Example
+### Example
 
-如果对以上说明还不理解，可以详细查看具体案例：
+详细查看具体案例
 
 - [task定义](https://github.com/go-microservice/user-service/tree/main/internal/tasks)
 - [运行server](https://github.com/go-microservice/user-service/blob/main/cmd/cron/main.go)
 
-## 重量型消息队列
+## Reference
 
-todo
+- <https://github.com/hibiken/asynq>
