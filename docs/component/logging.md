@@ -14,6 +14,8 @@ slug: /component/logging
 
 ## 接口定义
 
+日志基于 zap 进行封装，同时也支持日期切割，默认按照天进行切割。
+
 为了方便适配不通的日志接入，这里定义了几个接口
 
 ```go
@@ -56,7 +58,6 @@ type Logger interface {
 - `LoggerFile` 默认输出的日志文件名
 - `LoggerWarnFile` warn 输出的日志文件名
 - `LoggerErrorFile` error 输出的日志文件名
-
 
 ## 初始化日志
 
