@@ -28,6 +28,8 @@ dotenv
 env
 ```
 
+> 配置字段统一用驼峰写法
+
 ## 文件位置
 
 配置默认使用 `yaml` 格式，存放于项目根目录的 `config` 目录下。
@@ -63,7 +65,7 @@ env
 │   └── trace.yaml
 ```
 
-### 分环境配置模式
+### 多环境配置模式
 
 我们一般的环境有开发(dev)、测试(test)、线上(prod)环境，不同的环境可以对应不同的配置文件，如下：
 
@@ -112,7 +114,7 @@ go build
 # 单独配置启动模式
 ./eagle -c config
 
-# 分环境配置启动模式
+# 多环境配置启动模式
 ./eagle -c config -e dev
 # 或者
 APP_ENV=dev ./eagle -c config
@@ -120,7 +122,7 @@ APP_ENV=dev ./eagle -c config
 
 ## 读取配置
 
-以读取应用名为例
+默认读取的是 `yaml` 格式的文件， 以读取应用名为例
 
 ```go
 // main.go
@@ -170,11 +172,22 @@ fmt.Println(cfg)
 ### 指定不同的文件格式
 
 ```go
-# 加载 json 格式的配置
-conf, err := config.LoadWithType("redis", "json")
+// 加载 json 格式的配置
+conf, err := config.LoadJson("redis")
+// 加载 toml 格式的配置
+// conf, err := config.LoadToml("redis")
 if err != nil {
   // handle error
 }
 fmt.Println("redis addr: ", conf.GetString("redis.Addr"))
 fmt.Println("redis min idel conn: ", conf.GetInt("redis.MinIdleConn"))
+```
+
+如果默认提供的文件格式不支持，可以使用以下方式获取:
+
+```go
+conf, err := config.LoadWithType("redis", "ini")
+if err != nil {
+  // handle error
+}
 ```
