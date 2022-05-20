@@ -84,6 +84,7 @@ module.exports = {
       items: [
         'guide/api-protobuf',
         'guide/api-restful',
+        'guide/grpc-guide',
       ],
     },
     {

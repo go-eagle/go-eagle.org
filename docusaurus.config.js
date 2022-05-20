@@ -4,7 +4,7 @@ const darkCodeTheme = require('prism-react-renderer/themes/dracula');
 /** @type {import('@docusaurus/types').DocusaurusConfig} */
 module.exports = {
   title: 'Eagle',
-  tagline: 'A Go framework for microservice',
+  tagline: 'A microservice framework for Go',
   url: 'https://go-eagle.org',
   baseUrl: '/',
   onBrokenLinks: 'throw',
@@ -14,6 +14,15 @@ module.exports = {
   projectName: 'go-eagle.org', // Usually your repo name.
   trailingSlash: false,
   themeConfig: {
+    announcementBar: {
+      id: 'github-twitter',
+      content: '⭐️ If you like Eagle, give it a star on <a target="_blank" rel="noopener noreferrer" href="https://github.com/go-eagle/eagle">GitHub</a> 🚀'
+    },
+    colorMode: {
+      defaultMode: 'light',
+      disableSwitch: false,
+      respectPrefersColorScheme: true,
+    },
     hideableSidebar: true,
     navbar: {
       title: 'Eagle',
@@ -106,6 +115,10 @@ module.exports = {
           // Please change this to your repo.
           editUrl:
             'https://github.com/go-eagle/go-eagle.org/edit/main/',
+        },
+        googleAnalytics: {
+          trackingID: '',
+          anonymizeIP: true,
         },
         theme: {
           customCss: require.resolve('./src/css/custom.css'),

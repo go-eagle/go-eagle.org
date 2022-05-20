@@ -12,9 +12,11 @@ keywords:
 slug: /component/logging
 ---
 
-## 接口定义
+## 说明
 
-日志基于 zap 进行封装，同时也支持日期切割，默认按照天进行切割。
+日志基于 zap 进行封装，同时也支持切割，默认按照天进行切割。
+
+## 接口定义
 
 为了方便适配不通的日志接入，这里定义了几个接口
 
@@ -95,4 +97,30 @@ log.Error("this is a error log")
 err := errors.New("test error")
 log.Errorf("this is a error log, err: %+v", err)
 
+// 带有 trace_id 和span_id,可以配合 链路追踪组件排查问题
+log.WithContext(ctx).Info("this is a info log")
+```
+
+## 数据库日志
+
+如果想要查看数据库的执行SQL, 需要在 `database.yaml` 里进行配置
+
+### 打印所有SQL
+
+开启后，所有SQL会输出到标准输出里(控制台)，配置如下
+
+```yaml
+# config/database.yaml
+ShowLog: true
+SlowThreshold: 0
+```
+
+### 打印慢SQL
+
+以打印执行超过200ms的为例，SQL会输出到标准输出里(控制台)，配置如下
+
+```yaml
+# config/database.yaml
+ShowLog: false
+SlowThreshold: 200ms
 ```

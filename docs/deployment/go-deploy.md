@@ -61,7 +61,7 @@ EOF
 
 ```bash
 $ PB_REL="https://github.com/protocolbuffers/protobuf/releases"
-$ curl -LO $PB_REL/download/v3.12.1/protoc-3.15.6-linux-x86_64.zip
+$ curl -LO $PB_REL/download/v3.15.6/protoc-3.15.6-linux-x86_64.zip
 
 $ unzip protoc-3.15.6-linux-x86_64.zip -d /usr/local
 
