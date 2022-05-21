@@ -18,14 +18,11 @@ module.exports = {
       id: 'github-twitter',
       content: '⭐️ If you like Eagle, give it a star on <a target="_blank" rel="noopener noreferrer" href="https://github.com/go-eagle/eagle">GitHub</a> 🚀'
     },
-    colorMode: {
-      defaultMode: 'light',
-      disableSwitch: false,
-      respectPrefersColorScheme: true,
-    },
     hideableSidebar: true,
     navbar: {
       title: 'Eagle',
+      style: 'primary',
+      hideOnScroll: false,
       logo: {
         alt: 'Eagle Logo',
         src: 'img/logo.svg',
@@ -71,11 +68,7 @@ module.exports = {
           items: [
             {
               label: 'Discord',
-              href: 'https://discordapp.com/invite/docusaurus',
-            },
-            {
-              label: 'Twitter',
-              href: 'https://twitter.com/eagle',
+              href: 'https://discord.gg/HtTfsxFN',
             },
           ],
         },
@@ -127,13 +120,7 @@ module.exports = {
     ],
   ],
   plugins: [
-    [
-      require.resolve("@easyops-cn/docusaurus-search-local"),
-      {
-        hashed: true,
-        language: ["en", "zh"],
-      },
-    ],
+    'docusaurus-plugin-sass',
   ],
   i18n: {
     defaultLocale: 'zh',
