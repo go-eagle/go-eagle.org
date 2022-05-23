@@ -17,14 +17,18 @@ keywords:
 
 ## 环境准备
 
-- Go
+- [Go](https://golang.org/dl/)
+- [protoc](https://github.com/protocolbuffers/protobuf)
+- [protoc-gen-go](https://github.com/protocolbuffers/protobuf-go)
 
 开启GO111MODULE
+
 ```bash
 go env -w GO111MODULE=on
 ```
 
 国内用户可以配置[代理](https://goproxy.cn/)，加速下载
+
 ```bash
 go env -w GOPROXY="https://goproxy.cn,direct"
 
@@ -34,11 +38,12 @@ $ echo "export GOPROXY=https://goproxy.cn" >> ~/.profile
 $ source ~/.profile
 ```
 
-## 安装脚手架
+## 命令行工具
 
 安装 eagle 命令行工具
 
 ### go get 方式安装
+
 ```bash
 go get -v github.com/go-eagle/eagle/cmd/eagle
 ```
@@ -76,3 +81,5 @@ curl 'http://127.0.0.1:8080/health'
     "hostname":"host01"
 }
 ```
+
+恭喜💐，项目安装成功。

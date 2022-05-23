@@ -185,16 +185,16 @@ function Home() {
           </div>
           <div className={styles.testimonialsSection}>
             <div className={styles.testimonials}>
-              <h2>What they say about Foal</h2>
+              <h2>Eagle可以做什么</h2>
               <div className={styles.content}>
-                <Testimonial title="The missing NodeJS framework!" author="Loïc Poullain" job="fullstack developer">
-                  This is an awesome product.
+                <Testimonial title="微服务搭建" author="" job="">
+                  可以快速搭建微服务和HTTP服务，使用Eagle提供的核心组件，快速交付
                 </Testimonial>
-                <Testimonial title="Straightforward architecture" author="Loïc Poullain" job="fullstack developer">
-                  This is an awesome product.
+                <Testimonial title="多协议支持" author="" job="">
+                  可以通过一套 Proto API定义，实现HTTP/gRPC协议的服务
                 </Testimonial>
-                <Testimonial title="Awesome" author="Loïc Poullain" job="fullstack developer">
-                  This is an awesome product.
+                <Testimonial title="快速构建" author="" job="">
+                  通过 Eagle Cli 可以快速构建应用
                 </Testimonial>
               </div>
             </div>

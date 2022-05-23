@@ -12,22 +12,20 @@ keywords:
 slug: /
 ---
 
-Eagle 🦅一套轻量级 Go 微服务框架
-
 ### Goals
 
-🦅一款基于Go构建的微服务框架，可以快速构建API服务进行业务开发，遵循SOLID设计原则
+🦅一款基于Go构建的微服务框架，通过工具链可以快速构建支持HTTP/gRPC协议的API服务，遵循SOLID设计原则
 
 
 ### Features
 
 * Config：支持多种数据格式及热加载；
-* Transport：通用的 HTTP/gRPC 传输层，一个进程拥有多种协议；
-* Logger：标准日志接口，可方便集成三方 log 库；
-* Metrics：统一指标接口，可以实现各种指标系统，默认集成 Prometheus；
-* Tracing：支持微服务链路追踪，遵循 OpenTelemetry 规范定义；
+* Logger：标准日志接口，可方便集成三方 log 库，默认集成 Zap；
+* Transport：支持HTTP/gRPC通信协议，一个进程拥有多种协议；
+* API: 通过Protobuf进行定义；
+* Metrics：统一指标接口，默认集成 Prometheus；
+* Tracing：支持微服务链路追踪，遵循 OpenTelemetry 规范；
 * Registry: 支持服务注册与发现；
-* Errors：统一返回错误码格式；
 
 <!-- ### Architecture -->
 <!--  -->
@@ -36,16 +34,19 @@ Eagle 🦅一套轻量级 Go 微服务框架
 ### Related
 
 * [Docs](https://go-eagle.org/)
-* [Examples](https://github.com/go-microservice)
-* [Service Layout](https://github.com/go-eagle/eagle-layout)
+* [Example社交API-类Instagram](https://github.com/go-microservice)
+* [项目模板布局](https://github.com/go-eagle/eagle-layout)
 
 ### Community
+
 * QQ Group: 1074476202
 
 ### License
+
 Eagle is MIT licensed. See the [LICENSE](https://github.com/go-eagle/eagle/blob/master/LICENSE) file for details.
 
 ### Contributors
+
 感谢开发者们对本项目的贡献。
 <a href="https://github.com/go-eagle/eagle/graphs/contributors">
   <img src="https://contrib.rocks/image?repo=go-eagle/eagle" />

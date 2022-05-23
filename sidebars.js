@@ -20,6 +20,7 @@ module.exports = {
         'getting-started/start',
         'getting-started/layout',
         'getting-started/structure',
+        'getting-started/cli',
         'getting-started/faq',
       ],
     },
