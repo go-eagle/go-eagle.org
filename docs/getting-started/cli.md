@@ -13,13 +13,8 @@ keywords:
   - HTTP
 ---
 
-通过使用 eagle 命令行工具，可以：
-
-- 通过模板快速创建项目
-- 快速创建与生成 proto\repo\cache 文件
-- 使用开发过程中常用的命令
-- 极大提高开发效率，减轻心智负担
-
+通过使用 eagle 命令行工具，可以提高开发效率，减少手写带来的错误。  
+使得大家可以更加专注于业务开发。
 
 ## 安装
 
@@ -53,6 +48,7 @@ Usage:
 Available Commands:
   cache       Generate the cache file
   help        Help about any command
+  model       Generate the model file
   new         Create a project template
   proto       Generate the proto files
   repo        Generate the repo file
@@ -77,6 +73,65 @@ eagle new helloworld
 # or
 eagle new github.com/foo/helloworld
 ```
+
+### 生成model
+
+经常我们定义完数据库的表结构之后，需要来手写结构体，  
+字段数量少还可以，如果字段很多，手写起来可能会比较痛苦，且容易出错，  
+所以这里给大家提供了一个通过命令行生成的工具，使用方法如下：
+
+#### 使用方法
+
+```bash
+eagle model -h
+Generate the model file via database table.
+
+Usage:
+  eagle model [flags]
+
+Flags:
+  -d, --database string     database name
+  -f, --filename string     model filename
+      --format string       add json annotations (default)
+  -h, --help                help for model
+      --host string         database host addr (default "localhost")
+      --package string      package name (default "model")
+  -p, --password string     password for database (default "123456")
+  -s, --struct string       model struct name
+  -t, --table string        table name
+      --target-dir string   model target dir (default "internal/model")
+  -u, --user string         database username (default "root")
+```
+
+#### 示例1
+
+以生成用户model为例，设定用户表明为 `user`，通过交互式来生成：
+
+```bash
+➜ eagle model 回车  
+? What is file name ? user.go
+? What is database name ? eagle
+? What is table name ? user
+? What is struct name for model? UserModel
+🚀 Creating model user.go, please wait a moment.
+
+🍺 Model creation succeeded user.go
+```
+
+生成的 `user.go` 位于 `internal/model` 目录下。  
+
+#### 示例2
+
+以生成用户model为例，设定用户表明为 `user_info`，通过命令行参数的方式来生成：
+
+```bash
+➜ eagle model -f=user_info.go -d=eagle -t=user_info -s=UserInfoModel -u=root -p=123456 
+🚀 Creating model user_info.go, please wait a moment.
+
+🍺 Model creation succeeded user_info.go
+```
+
+两种方式生成的内容是一致的，大家可以根据爱好自行选择。
 
 ### 定义proto
 
