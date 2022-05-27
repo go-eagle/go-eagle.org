@@ -47,13 +47,23 @@ module.exports = {
         },
         {
           type: 'category',
-          label: '中间件',
+          label: 'HTTP 中间件',
           collapsed: true,
           items: [
             'component/middleware/overview',
             'component/middleware/logging',
             'component/middleware/metrics',
             'component/middleware/tracing',
+          ],
+        },
+        {
+          type: 'category',
+          label: '拦截器(interceptor)',
+          collapsed: true,
+          items: [
+            'component/interceptor/overview',
+            'component/interceptor/logging',
+            'component/interceptor/custom',
           ],
         },
         {
