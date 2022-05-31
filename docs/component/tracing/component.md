@@ -33,12 +33,44 @@ slug: /component/tracing/component
   g.Use(middleware.Tracing("eagle-service"))
 ```
 
-
 ### 日志
+
+通过使用如下方式可以开启日志记录tracing 信息
+
+```go
+log.WithContext(ctx).Info("test log tracing")
+```
 
 ### 数据库
 
+目前主要使用 gorm v2版本，支持传入 `context`
+
+```go
+db.WithContext(ctx).First()
+```
+
 ### Redis
 
-### 自定义函数
+使用 `go-redis` 组件，支持链路追踪， 举例
 
+```go
+rdb.Get(ctx, "test-key")
+```
+
+### 函数追踪
+
+一般情况下，使用以上和网络相关的组件基本可以进行全链路追踪了，但是如果需要追踪某些函数的，就需要自定义了。
+
+```go
+// 定义 tracer
+traceName := "func_tracer"
+tracer := otel.GetTracerProvider().Tracer(traceName, trace.WithInstrumentationVersion(contrib.SemVersion()))
+
+// 使用
+funcName := "GetUserInfo"
+ctx, span := tracer.Start(ctx, funcName)
+defer span.End()
+...
+```
+
+这里有点不太好的是，`funcName` 每次都需要手动填写，很不方便, 同时也没有提供调用者的文件名、行号等，所以后续会封装一个trace函数的公共方法到框架里，方便使用。

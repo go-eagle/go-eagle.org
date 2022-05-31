@@ -16,6 +16,14 @@ slug: /component/logging
 
 日志基于 zap 进行封装，同时也支持切割，默认按照天进行切割。
 
+## 功能点
+
+- 支持日志写入到多个流中，控制台或日志文件
+- 支持多日志级别，包括：DEBUG,INFO,WARN,ERROR
+- 支持结构化输出，默认json，方便日志收集
+- 支持日志切割，按时间进行切割
+- 支持打印文件和行号
+
 ## 接口定义
 
 为了方便适配不通的日志接入，这里定义了几个接口
@@ -24,6 +32,9 @@ slug: /component/logging
 // github.com/go-eagle/eagle/pkg/log/logger.go
 
 type Logger interface {
+  Debug(args ...interface{})
+  Debugf(format string, args ...interface{})
+
   Info(args ...interface{})
   Infof(format string, args ...interface{})
 
@@ -45,7 +56,7 @@ type Logger interface {
   DisableCaller: false
   DisableStacktrace: false
   Encoding: json   # json or console
-  Level: info      # 日志级别，INFO, WARN, ERROR
+  Level: info      # 日志级别，DEBUG, INFO, WARN, ERROR
   Name: eagle
   Writers: console # file or console
   LoggerFile: /tmp/log/eagle.log           # 所有level的日志文件
@@ -60,6 +71,8 @@ type Logger interface {
 - `LoggerFile` 默认输出的日志文件名
 - `LoggerWarnFile` warn 输出的日志文件名
 - `LoggerErrorFile` error 输出的日志文件名
+
+> 开发环境可以两者都开发，生产环境只输出到文件
 
 ## 初始化日志
 

@@ -35,6 +35,7 @@ module.exports = {
         'component/metrics',
         'component/cache',
         'component/distributed-lock',
+        'component/registry',
         'component/queue',
         {
           type: 'category',
