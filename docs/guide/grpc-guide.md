@@ -93,32 +93,6 @@ protocol buffer编译器(protoc)生成的代码包含
 - 客户端使用方法调用的远程接口存根（`*_grpc.pb.go`）
 - 服务器代码实现的抽象接口（`*_grpc.pb.go`）
 
-#### 扩展阅读
-
-通过protoc 生成pb有两种方式，对于第二种方式，了解下即可，见到后知道是怎么回事。
-
-- 最新方式(推荐)
-
-> 使用：google.golang.org/protobuf
-
-```bash
-$ protoc --go_out=. --go_opt=paths=source_relative \
-    --go-grpc_out=. --go-grpc_opt=paths=source_relative \
-    api/like/v1/like.proto
-```
-
-> 会生成两个文件 `*.pb.go` 和 `*._grpc.pb.go`, 分别是消息序列化代码和 `gRPC` 代码.
-
-- 较早方式(已废弃)
-
-> 使用：github.com/golang/protobuf
-
-```bash
-$ protoc -I . --go_out=plugins=grpc,paths=source_relative:. api/like/v1/like.proto
-```
-
-> 生成的 `*.pb.go` 包含消息序列化代码和 `gRPC` 代码.
-
 ### 4、生成server骨架代码
 
 实现了上一步生成的接口(`*_grpc.pb.go` 内)
@@ -240,6 +214,32 @@ grpcurl -plaintext -d '{"user_id":2}' localhost:9090 api.like.v1.LikeService/Lis
 ## 完整案例
 
 具体代码可以参看：[动态服务](https://github.com/go-microservice/moment-service)
+
+## 扩展阅读
+
+通过protoc 生成pb有两种方式，对于第二种方式，了解下即可，见到后知道是怎么回事。
+
+### 最新方式(推荐)
+
+> 使用：google.golang.org/protobuf
+
+```bash
+$ protoc --go_out=. --go_opt=paths=source_relative \
+    --go-grpc_out=. --go-grpc_opt=paths=source_relative \
+    api/like/v1/like.proto
+```
+
+> 会生成两个文件 `*.pb.go` 和 `*._grpc.pb.go`, 分别是消息序列化代码和 `gRPC` 代码.
+
+### 较早方式(已废弃)
+
+> 使用：github.com/golang/protobuf
+
+```bash
+$ protoc -I . --go_out=plugins=grpc,paths=source_relative:. api/like/v1/like.proto
+```
+
+> 生成的 `*.pb.go` 包含消息序列化代码和 `gRPC` 代码.
 
 ## FAQ
 
