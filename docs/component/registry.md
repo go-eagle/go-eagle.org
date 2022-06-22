@@ -1,7 +1,7 @@
 ---
 id: registry
-title: 服务注册与发现
-description: 服务注册与发现
+title: 注册与发现
+description: 注册与发现
 keywords:
   - Go
   - Eagle

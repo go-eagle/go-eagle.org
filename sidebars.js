@@ -35,8 +35,9 @@ module.exports = {
         'component/metrics',
         'component/cache',
         'component/distributed-lock',
-        'component/registry',
+        'component/cronjob',
         'component/queue',
+        'component/registry',
         {
           type: 'category',
           label: '链路追踪',
@@ -48,7 +49,7 @@ module.exports = {
         },
         {
           type: 'category',
-          label: 'HTTP 中间件',
+          label: '中间件(HTTP)',
           collapsed: true,
           items: [
             'component/middleware/overview',
@@ -59,7 +60,7 @@ module.exports = {
         },
         {
           type: 'category',
-          label: '拦截器(interceptor)',
+          label: '拦截器(gRPC)',
           collapsed: true,
           items: [
             'component/interceptor/overview',

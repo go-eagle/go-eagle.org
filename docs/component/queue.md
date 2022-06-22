@@ -41,7 +41,6 @@ slug: /component/queue
 - 支持即时、延迟和定时消息
 - 支持多worker消费
 - 支持超时、重试、过期
-- 支持定时任务，类似 crontab, 可精确到秒
 - 支持worker崩溃自动恢复机制
 - 支持redis单机、集群和哨兵模式(Sentinels)
 - 支持 web UI 查看
@@ -182,30 +181,6 @@ _, err := GetClient().Enqueue(task, asynq.Queue(QueueCritical))
     // 这里进行注册
     mux.HandleFunc(tasks.TypeEmailWelcome, tasks.HandleEmailWelcomeTask)
     ...
-```
-
-### 注册定时任务
-
-定时任务和其他消息不太一样，直接在 `main.go` 里注册即可
-
-```go
-scheduler := asynq.NewScheduler(
-    asynq.RedisClientOpt{Addr: cfg.Addr},
-    &asynq.SchedulerOpts{Location: time.Local},
-)
-
- // 这里进行任务的注册
- // start
- t, _ := task.NewEmailWelcomeTask(6)
- if _, err := scheduler.Register("@every 5s", t); err != nil {
-    log.Fatal(err)
- }
- // end
-
- // Run blocks and waits for os signal to terminate the program.
- if err := scheduler.Run(); err != nil {
-    log.Fatal(err)
- }
 ```
 
 ### 启动server

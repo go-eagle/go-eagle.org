@@ -145,7 +145,7 @@ service UserService {
   }
   rpc UpdateUser(UpdateUserRequest) returns (UpdateUserReply) {
     option (google.api.http) = {
-      patch: "/v1/users/{user_id}"
+      put: "/v1/users/{user_id}"
       body: "*"
     };
   }
@@ -282,7 +282,113 @@ make http
 
 运行完此命令后，会多一个 `user_gin.pb.go` 文件，里面包含了接口定义和路由的注册。
 
-### 启动应用并验证
+### 生成自定义 tag
+
+如果是使用了一些自定义tag, 那么需要通过如下命令来生成绑定的struct上
+
+常见的tag有两种： `uri` 和 `form`
+
+#### URI tag
+
+在使用uri参数(`/v1/users/:id`)的时候会用到 `uri` tag, 否则参数无法被接收到。 定义如下
+
+```protobuf
+message GetUserRequest {
+	// @gotags: uri:"id"
+	int64 id = 1;
+}
+```
+
+使用命令成 tag
+
+```bash
+protoc-go-inject-tag -input=./api/micro/user/v1/user.pb.go
+```
+
+生成结果如下
+
+```go
+// 路由: http://localhost/v1/user/:id
+
+// 生成前 user.pb.go
+type GetUserRequest struct {
+	state         protoimpl.MessageState
+	sizeCache     protoimpl.SizeCache
+	unknownFields protoimpl.UnknownFields
+
+	// @gotags: uri:"id"
+	Id int64 `protobuf:"varint,1,opt,name=id,proto3" json:"id,omitempty"`
+}
+
+// 生成后 user.pb.go
+type GetPostRequest struct {
+	state         protoimpl.MessageState
+	sizeCache     protoimpl.SizeCache
+	unknownFields protoimpl.UnknownFields
+
+	// @gotags: uri:"id"
+	Id int64 `protobuf:"varint,1,opt,name=id,proto3" json:"id,omitempty" uri:"id"`
+}
+```
+
+> 注意：Id 字段最后面多了一个 uri tag 哦
+
+这样我们就可以完美的接收 uri 里定义的参数了。
+
+#### form tag
+
+在使用query参数的时候会用到 `form` tag, 否则参数无法被接收到。 定义如下:
+
+```protobuf
+message ListUserRequest {
+	// @gotags: form:"last_id"
+	int64 last_id = 1;
+	// @gotags: form:"limit"
+	int32 limit = 2;
+}
+```
+
+使用命令成 tag
+
+```bash
+protoc-go-inject-tag -input=./api/micro/user/v1/user.pb.go
+```
+
+生成结果如下
+
+```go
+// 路由: http://localhost/v1/users?limit=10&last_id=200
+
+// 生成前 user.pb.go
+type ListUserRequest struct {
+	state         protoimpl.MessageState
+	sizeCache     protoimpl.SizeCache
+	unknownFields protoimpl.UnknownFields
+
+	// @gotags: form:"last_id"
+	LastId int64 `protobuf:"varint,1,opt,name=last_id,json=lastId,proto3" json:"last_id,omitempty"`
+	// @gotags: form:"limit"
+	Limit int32 `protobuf:"varint,2,opt,name=limit,proto3" json:"limit,omitempty"`
+}
+
+// 生成后 user.pb.go
+type ListUserRequest struct {
+	state         protoimpl.MessageState
+	sizeCache     protoimpl.SizeCache
+	unknownFields protoimpl.UnknownFields
+
+	// @gotags: form:"id"
+	LastId int64 `protobuf:"varint,1,opt,name=last_id,json=lastId,proto3" json:"last_id,omitempty" form:"id"`
+	// @gotags: form:"id"
+	Limit int32 `protobuf:"varint,2,opt,name=limit,proto3" json:"limit,omitempty" form:"id"`
+}
+```
+
+这样我们就可以完美的接收 query 里定义的参数了。
+
+完整示例可参考：[https://github.com/go-microservice/ins-api](https://github.com/go-microservice/ins-api)
+
+### 运行并验证
 
 ```bash
 go run main.go
