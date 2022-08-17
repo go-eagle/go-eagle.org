@@ -382,6 +382,8 @@ vim ~/.config/nvim/coc-settings.json
 
 安装扩展
 
+> 注意： 需要安装 node，否则安装无效
+
 ```bash
 :CocInstall coc-json coc-tsserver
 
