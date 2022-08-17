@@ -61,9 +61,12 @@ EOF
 
 ```bash
 $ PB_REL="https://github.com/protocolbuffers/protobuf/releases"
-$ curl -LO $PB_REL/download/v3.15.6/protoc-3.15.6-linux-x86_64.zip
+# 如果是macOS 可以改为 osx
+$ OS="linux"
+$ VERSION="3.19.4"
+$ curl -LO $PB_REL/download/v$VERSION/protoc-$VERSION-$OS-x86_64.zip
 
-$ unzip protoc-3.15.6-linux-x86_64.zip -d /usr/local
+$ unzip protoc-$VERSION-$OS-x86_64.zip -d /usr/local
 
 $ export PATH="$PATH:/usr/local/bin"
 ```
