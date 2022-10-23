@@ -99,6 +99,7 @@ module.exports = {
         'guide/api-restful',
         'guide/grpc-guide',
         'guide/http-guide',
+        'guide/grpc-benchmark',
       ],
     },
     {

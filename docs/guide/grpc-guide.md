@@ -1,6 +1,6 @@
 ---
 id: grpc-guide
-title: gRPC 开发流程
+title: 开发流程 - gRPC
 description: Eagle 一套轻量级 Go 微服务框架，包含大量微服务相关框架及工具
 keywords:
   - Go

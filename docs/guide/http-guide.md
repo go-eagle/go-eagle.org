@@ -1,6 +1,6 @@
 ---
 id: http-guide
-title: HTTP API 开发流程
+title: 开发流程 - HTTP
 description: HTTP API 开发流程 Eagle 一套轻量级 Go 微服务框架，包含大量微服务相关框架及工具
 keywords:
   - Go
@@ -397,3 +397,47 @@ go run main.go
 ```
 
 恭喜你，已经学会了这三种定义handler的方式。
+
+### 常见问题
+
+Q: 在输出json时，对于字段为零值的字段没有被返回，对于前端或客户端不太友好，该怎么处理？
+A: 使用 `gogoproto` 来进行处理，具体过程如下
+
+1、在 proto文件中 improt gogo.proto 文件
+
+```protobuf
+syntax = "proto3";
+
+package api.micro.moment.v1;
+
+...
+import "github.com/gogo/protobuf/gogoproto/gogo.proto";
+...
+
+```
+
+2、在对应的字段后面加上对应的 tag 标记
+
+```protobuf
+...
+message User {
+  int32 id = 1 [(gogoproto.jsontag) = "id"]; // 新增了 gogoproto.jsontag
+  string name = 2;
+  string email = 3;
+}
+...
+```
+
+3、再次运行 `make grpc` 后 `user.pb.go` 文件中 id的 `omitempty` tag 就消失了
+
+```protobuf
+type Person struct {
+  Id          int32                  `protobuf:"varint,2,opt,name=id,proto3" json:"id"`
+  Name        string                 `protobuf:"bytes,1,opt,name=name,proto3" json:"name,omitempty"`
+  Email       string                 `protobuf:"bytes,3,opt,name=email,proto3" json:"email,omitempty"`
+}
+```
+
+## Reference
+
+- [ProtoBuf 生成 Go 代码去掉 JSON tag omitempty](https://cloud.tencent.com/developer/article/2014822)
