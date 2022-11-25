@@ -211,9 +211,88 @@ grpcurl -plaintext -d '{"user_id":2}' localhost:9090 api.like.v1.LikeService/Lis
 - -d 提交的参数， json格式
 - -plaintext 使用纯文本连接，跳过TLS
 
+## 单元测试
+
+```go
+package service
+
+import (
+	"context"
+	"log"
+	"net"
+	"testing"
+	"time"
+
+	"google.golang.org/grpc"
+	"google.golang.org/grpc/test/bufconn"
+
+	pb "github.com/go-microservice/user-service/api/user/v1"
+)
+
+const (
+	addr    = ""
+	bufSize = 1024 * 1024
+)
+
+var (
+	lis *bufconn.Listener
+	srv *grpc.Server
+)
+
+func initGRPCServer() {
+	lis = bufconn.Listen(bufSize)
+	srv = grpc.NewServer()
+
+	pb.RegisterUserServiceServer(srv, &UserServiceServer{})
+
+	go func() {
+		if err := srv.Serve(lis); err != nil {
+			log.Fatalf("srv.Serve, err: %v", err)
+		}
+	}()
+}
+
+func TestUserServiceServer_GetUser(t *testing.T) {
+	initGRPCServer()
+	t.Cleanup(func() {
+		lis.Close()
+		srv.Stop()
+	})
+
+	// test
+	dialer := func(context.Context, string) (net.Conn, error) {
+		return lis.Dial()
+	}
+
+	ctx, cancel := context.WithTimeout(context.Background(), time.Second)
+	t.Cleanup(func() {
+		cancel()
+	})
+
+	conn, err := grpc.DialContext(ctx, addr, grpc.WithContextDialer(dialer), grpc.WithInsecure())
+	t.Cleanup(func() {
+		conn.Close()
+	})
+	if err != nil {
+		log.Fatalf("grpc.DialContext, err: %v", err)
+	}
+
+	client := pb.NewUserServiceClient(conn)
+	resp, err := client.GetUser(context.Background(), &pb.GetUserRequest{Id: 1})
+	if err != nil {
+		t.Fatalf("client.GetUser, err: %v", err)
+	}
+
+	if resp.User.Id != 1 {
+		t.Fatalf("Unexpected values: %v", resp.User)
+	}
+}
+
+```
+
 ## 完整案例
 
-具体代码可以参看：[动态服务](https://github.com/go-microservice/moment-service)
+具体代码可以参看：[用户服务](https://github.com/go-microservice/user-service)
 
 ## 扩展阅读
 
