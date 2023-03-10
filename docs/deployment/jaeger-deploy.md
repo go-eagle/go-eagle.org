@@ -232,6 +232,7 @@ spec:
         use-aliases: true
         index-prefix: tracing-jaeger
     # 当 use-aliases 为 true, 会开启两个cronjob: esRollover esLookback
+    # 这里需要注意下版本，有些版本使用的是es6的操作语法，而本身使用的是es7的话会有一些问题
     # cronjob
     esIndexCleaner:
       enabled: true
@@ -242,7 +243,7 @@ spec:
       conditions: "{\"max_age\": \"1d\"}"
       readTTL: 120h
       schedule: "55 23 * * *"
-    # spark
+    # 需要部署spark，供spark使用
     dependencies:
       enabled: true
       schedule: "55 23 * * *"
@@ -252,6 +253,16 @@ spec:
           memory: 4096Mi
         limits:
           memory: 4096Mi
+          
+  query:
+    options:
+      es:
+        # 使用别名进行查询
+        use-aliases: true
+      dependencies:
+        menuEnabled: true
+      # 可以自定义菜单
+      menu: []
 
   agent:
     resources:
