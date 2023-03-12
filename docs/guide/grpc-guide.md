@@ -211,6 +211,12 @@ grpcurl -plaintext -d '{"user_id":2}' localhost:9090 api.like.v1.LikeService/Lis
 - -d 提交的参数， json格式
 - -plaintext 使用纯文本连接，跳过TLS
 
+其他客户端调试工具
+
+- 类似curl的调试工具 https://github.com/fullstorydev/grpcurl
+- 交互式的调试工具 https://github.com/ktr0731/evans
+- UI调试工具 https://github.com/fullstorydev/grpcui
+
 ## 单元测试
 
 ```go
@@ -322,9 +328,40 @@ $ protoc -I . --go_out=plugins=grpc,paths=source_relative:. api/like/v1/like.pro
 
 ## FAQ
 
-Q: `github.com/golang/protobuf` 和 `google.golang.org/protobuf` 有什么区别？  
-A: `github.com/golang/protobuf` 模块是原始的 Go protocol buffer API。
+Q1: `github.com/golang/protobuf` 和 `google.golang.org/protobuf` 有什么区别？    
+A: `github.com/golang/protobuf` 模块是原始的 Go protocol buffer API。  
 `google.golang.org/protobuf` 模块是此 API 的更新版本，旨在简化、易用和安全，更新后的 API 的旗舰功能是支持反射以及将面向用户的 API 与底层实现分离。
+
+Q2: 如果通过proto生成的结构体在访问http接口时，当返回值为零值的时候，json字段不显示如何处理？    
+A: 可以在message的字段中加入 `gogoproto.jsontag`， 示例如下：
+```proto
+import "gogo/protobuf/gogo.proto";
+
+message ListPostReply {
+	repeated Post items = 1 [(gogoproto.jsontag) = "items"];
+	int64 count = 2 [(gogoproto.jsontag) = "count"];
+	bool has_more = 3 [(gogoproto.jsontag) = "has_more"];
+	string last_id = 4 [(gogoproto.jsontag) = "last_id"];
+}
+```
+
+Q3: 如何接收uri中或者form里的参数？  
+A: 可以使用 `gogoproto.moretags`，示例如下：
+```proto
+import "gogo/protobuf/gogo.proto";
+
+// 接收uri中的参数
+message GetPostRequest {
+	string id = 1 [(gogoproto.moretags) = 'uri:"id"'];
+}
+
+// 接收form里的参数
+message ListPostRequest {
+	int64 last_id = 1 [(gogoproto.moretags) = 'form:"last_id"'];
+	int32 limit = 2 [(gogoproto.moretags) = 'form:"limit"'];
+}
+```
+
 
 > https://developers.google.com/protocol-buffers/docs/reference/go/faq
 

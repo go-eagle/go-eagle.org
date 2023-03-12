@@ -61,11 +61,24 @@ func main() {
 
 ### HTTP Client
 
-启用 `Tracing` 功能后，`HTTP` 客户端会自动注入，用户无需关心具体细节
+启用 `Tracing` 功能后，`HTTP` 客户端会自动注入，用户无需关心具体细节。
 
-使用方式和原来保持不变.
+使用方式如下：
 
-代码路径: `github.com/go-eagle/eagl/pkg/client/httpclient/client.go`
+```go
+# github.com/go-eagle/eagl/pkg/client/httpclient/client.go
+
+  ret, err := GetJSON(context.Background(), "http://httpbin.org/get")
+  if err != nil {
+    // handle error
+  }
+```
+
+如果请求的过程中有发生报错，httpclient 会自动将该请求标记为错误的状态，在 jaeger的 ui中会显示出来，如下：
+
+```go
+  trace.SetSpanError(ctx, err)
+```
 
 ### HTTP Server
 
@@ -86,6 +99,8 @@ func main() {
 ```go
 log.WithContext(ctx).Info("test log tracing")
 ```
+
+> 通过 `WithContext` 会将 `trace_id` 和 `span_id` 记录到日志中，方便和链路追踪系统一起定位问题。
 
 ### 数据库
 
@@ -135,12 +150,12 @@ func a(ctx context.Context) {
 
 主要包含以下步骤
 
-1、修改配置文件 `config/trace.yaml`
-2、初始化trace
-3、开启trace中间件
-4、handler方法中开启函数trace
-5、在service中开启函数trace
-6、在数据库和redis中开启trace(可选)
+- 1、修改配置文件 `config/trace.yaml`
+- 2、初始化trace
+- 3、开启trace中间件
+- 4、handler方法中开启函数trace
+- 5、在service中开启函数trace
+- 6、在数据库和redis中开启trace(可选)
 
 > 如果想追踪任务函数，只要在函数的开始处增加函数追踪代码即可。
 
@@ -179,3 +194,13 @@ func a(ctx context.Context) {
 ![api-trace-redis](/images/api-trace-redis.png)
 
 可以看到Redis执行的具体内容及耗时。
+
+### 标记为错误状态
+
+```go
+  trace.SetSpanError(ctx, err)
+```
+
+使用后，效果如下
+
+// TODO: 
