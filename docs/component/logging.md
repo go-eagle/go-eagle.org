@@ -133,7 +133,7 @@ type Logger interface {
 - warn 会打印 warn、error 级别的日志
 - error 只会打印级别的日志
 
-所以建议生产环境开启 `warn` 或 `error` 级别的日志。 
+所以建议生产环境建议开启 `warn` 或 `error` 级别的日志。 
 
 ### Name
 
