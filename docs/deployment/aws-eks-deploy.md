@@ -80,7 +80,7 @@ slug: /deployment/aws-eks-deploy
 
 ### 给用户添加策略
 
-IAM -> user -> usergroup -> developer(之前自己定义的名称) -> 添加policy:
+IAM -> user -> usergroup -> deployment(之前自己定义的名称) -> 添加policy:
 
 - Service: EKS
 - Actions: All EKS Actions
