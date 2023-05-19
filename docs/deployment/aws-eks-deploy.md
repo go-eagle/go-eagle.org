@@ -91,6 +91,8 @@ IAM -> user -> usergroup -> deployment(之前自己定义的名称) -> 添加pol
 
 ```bash
 aws eks update-kubeconfig --name microservice --region us-east-1
+# Output
+Added new context arn:aws:eks:us-east-1:xxxxxxxx:cluster/microservice to ~/.kube/config
 ```
 
 ### 切换到指定集群
