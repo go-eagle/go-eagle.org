@@ -105,9 +105,15 @@ kubectl config use-context arn:aws:eks:us-east-1:xxxxxxxx:cluster/microservice
 
 ```bash
 kubectl cluster-info
+
+# Output
+Kubernetes control plane is running at https://D5420D4721F9178A5090C1DDFD451415.gr7.ap-southeast-1.eks.amazonaws.com
+CoreDNS is running at https://D5420D78A5090C451415.gr7.us-east-1.eks.amazonaws.com/api/v1/namespaces/kube-system/services/kube-dns:dns/proxy
+
+To further debug and diagnose cluster problems, use 'kubectl cluster-info dump'.
 ```
 
-此时会报错：`error: You must be logged to the server (Unauthorized)`  
+此时如果报错：`error: You must be logged to the server (Unauthorized)`  
 查看配置：`aws sts get-caller-identity`
 
 ```bash
