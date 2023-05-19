@@ -119,7 +119,7 @@ kubectl cluster-info
 原因是：不是集群的root用户或者owner用户，所以无法操作。
 解决方法：配置 `KeyID` 和 `SecretKey`
 
-- 查看现有的key: `cat ~/.aws/credentials`
+- 查看现有的key: `cat ~/.aws/config`
 
 ```bash
 # Output
