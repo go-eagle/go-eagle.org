@@ -88,6 +88,7 @@ module.exports = {
         'deployment/go-deploy',
         'deployment/jaeger-deploy',
         'deployment/app-deploy',
+        'deployment/aws-eks-deploy',
       ],
     },
     {
