@@ -100,3 +100,83 @@ if err := c.ShouldBindJSON(&req); err != nil {
   return
 }
 ```
+
+## 如何处理错误
+
+分层架构下，比较常见的错误处理方式，是在处理错误的地方进行打日志，如下：
+
+```go
+// handler / controller
+res, err := service.GetById(ctx, id)
+if err != nil {
+    log.Errorf(ctx, "GetById failed, id=%s, error=%v", err)
+    ······
+}
+······
+  
+// service  
+article, err := dao.GetById(ctx, id)
+if err != nil {
+    log.Errorf(ctx, fmt.Errorf("[service] GetById failed, error=%v", err))
+    return fmt.Errorf("[service] GetById failed, error=%v", err)
+}
+······
+
+// dao/respository
+······
+if err != nil {
+    log.Errorf(ctx, fmt.Errorf("[dao] GetById failed, id=%s, error=%v", id, err))
+    return fmt.Errorf("[dao] GetById failed, id=%s, error=%v", id, err)
+}
+```
+
+以上错误处理的方式，在每一层都打印一条错误日志，然后对得到的 error 进行二次封装。虽然这种处理方式可以使我们在查看日志时方便排查故障和定位问题，同时提供了错误的上下文信息，但也存在以下问题：
+
+- 每层都打印日志，带来了大量日志；
+- 字符串拼接费时费力，缺乏统一规范，可能导致理解困难；
+- 通过字符串拼接，获得新 error，破坏了原始 error，会导致等值判定失败，难以获取详细的堆栈关联。
+
+### 分层下的最佳 error 处理方式
+
+错误处理的最佳实践是遵循以下建议，这样可以更好地处理 error ：
+
+- 1、一个 error，应该只被处理一次
+- 2、让 error 包含更多的信息
+- 3、原始 error，应保证完整性，不被破坏
+- 4、error 需要被日志记录
+
+示例如下
+
+```go
+// handler / controller  
+res, err := service.GetById(ctx, id)  
+if err != nil {
+  // 打印根因
+  log.Errorf(ctx, "GetById failed, original error: %T %v", errors.Cause(err), errors.Cause(err))
+  // 或 打印堆栈
+  log.Errorf(ctx, "stack trace: \n%+v\n", err)  
+······  
+}  
+······  
+  
+// service  
+article, err := dao.GetById(ctx, id)  
+if err != nil {
+  // 只附加额外的信息
+  return errors.WithMessage(err, "[service] GetById failed")  
+}  
+······  
+  
+// respository/dao
+······  
+if err != nil {
+  // 保留根因、提供堆栈信息、并添加额外的上下文信息
+  return errors.Wrapf(err, "[dao] GetById failed, id=%s, error=%v", id, err)  
+}  
+······
+```
+
+## Reference
+
+- https://mp.weixin.qq.com/s/FkqCidcHlH2cadtsSft-ig
+
