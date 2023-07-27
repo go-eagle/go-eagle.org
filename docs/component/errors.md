@@ -103,6 +103,8 @@ if err := c.ShouldBindJSON(&req); err != nil {
 
 ## 如何处理错误
 
+推荐使用：`github.com/pkg/errors`
+
 分层架构下，比较常见的错误处理方式，是在处理错误的地方进行打日志，如下：
 
 ```go
