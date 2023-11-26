@@ -1,6 +1,6 @@
 ---
-id: queue
-title: 消息队列
+id: redis
+title: Redis 消息队列
 description: Eagle 一套轻量级 Go 微服务框架，包含大量微服务相关框架及工具
 keywords:
   - Go
@@ -9,8 +9,8 @@ keywords:
   - Toolkit
   - Framework
   - Microservices
-  - HTTP
-slug: /component/queue
+  - Redis
+slug: /component/queue/redis
 ---
 
 ## 概览
@@ -22,11 +22,11 @@ slug: /component/queue
 - 网上购物下订单，30分钟内未支付订单会被关闭（延迟消息）
 - 在指定的时间运行任务（定时消息）
 
-在 Eagle 框架中，分为两类消息队列，一种是偏轻量型的消息队列(主要使用redis)，一种重量型一点的消息队列(RabbitMQ或Kafak)，下面详细介绍。
+在 Eagle 框架中，分为两类消息队列，一种是偏轻量型的消息队列(主要使用redis)，一种重量型一点的消息队列(RabbitMQ或Kafak)，下面详细介绍，本文主要介绍 `Redis` 消息队列。
 
-## 消息队列
+## Redis 消息队列
 
-这里所谓的轻量主要是对使用底层存储的考量，redis 大家基本都在用，使用和部署都比较简单。  
+这里所谓的轻量主要是对使用底层存储的考量，**redis** 大家基本都在用，使用和部署都比较简单。  
 
 :::caution
 主要是对 asynq 做了简单的封装

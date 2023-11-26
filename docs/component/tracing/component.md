@@ -76,7 +76,7 @@ func main() {
 
 如果请求的过程中有发生报错，httpclient 会自动将该请求标记为错误的状态，在 jaeger的 ui中会显示出来，如下：
 
-```go
+```gos
   trace.SetSpanError(ctx, err)
 ```
 

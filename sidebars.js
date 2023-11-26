@@ -36,7 +36,15 @@ module.exports = {
         'component/cache',
         'component/distributed-lock',
         'component/cronjob',
-        'component/queue',
+        {
+          type: 'category',
+          label: '消息队列',
+          collapsed: true,
+          items: [
+            'component/queue/redis',
+            'component/queue/rabbitmq',
+          ],
+        },
         'component/registry',
         {
           type: 'category',
