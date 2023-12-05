@@ -53,7 +53,7 @@ go get -v github.com/go-eagle/eagle/cmd/eagle
 > Go 1.16 版本以上使用该方式
 
 ```bash
-go install github.com/go-eagle/eagle/cmd/eagle
+go install github.com/go-eagle/eagle/cmd/eagle@latest
 ```
 
 ## 创建项目
