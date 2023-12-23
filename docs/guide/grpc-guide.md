@@ -133,7 +133,7 @@ func NewGRPCServer(
 }
 ```
 
-### 6、在生成的server中编写业务逻辑
+### 6、在server中编写业务逻辑
 
 这里编写具体的业务逻辑
 
@@ -326,6 +326,67 @@ $ protoc -I . --go_out=plugins=grpc,paths=source_relative:. api/like/v1/like.pro
 
 > 生成的 `*.pb.go` 包含消息序列化代码和 `gRPC` 代码.
 
+### 为 proto 增加校验规则
+
+1、在 `proto` 中加入校验规则
+
+```bash
+// api/user/v1/user.proto
+syntax = "proto3";
+
+package user.v1;
+
+import "google/protobuf/empty.proto";
+import "validate/validate.proto";
+...
+// 在对应的字段中加入校验规则
+message RegisterRequest {
+  string username = 1 [(validate.rules).string.min_len = 5];
+  string email = 2 [(validate.rules).string.email = true];
+  string password = 3 [(validate.rules).string.min_len = 6];
+}
+...
+```
+
+2、在 server 中启用校验
+
+```go
+...
+func (s *UserServiceServer) Register(ctx context.Context, req *pb.RegisterRequest) (*pb.RegisterReply, error) {
+	err := req.Validate()
+	if err != nil {
+		return nil, ecode.ErrInvalidArgument.WithDetails(errcode.NewDetails(map[string]interface{}{
+			"msg": err.Error(),
+		})).Status(req).Err()
+	}
+	...
+}
+```
+
+比如邮箱错误会返回:
+
+```
+0: {
+	type_url: type.googleapis.com/user.v1.RegisterRequest
+	value: Cgd1c2VyMDAxEgl0ZXN0ZW1haWwaBjEyMzQ1Ng==
+},
+1: {
+	type_url: type.googleapis.com/google.protobuf.Struct
+	value: CngKA21zZxJxGm9pbnZhbGlkIFJlZ2lzdGVyUmVxdWVzdC5FbWFpbDogdmFsdWUgbXVzdCBiZSBhIHZhbGlkIGVtYWlsIGFkZHJlc3MgfCBjYXVzZWQgYnk6IG1haWw6IG1pc3NpbmcgJ0AnIG9yIGFuZ2xlLWFkZHI=
+}
+```
+
+注意：返回的错误信息是经过序列化的 `Google Protocol Buffers (protobuf)` 格式，让我们分析其中的每个字段：
+
+`type_url`：
+
+这个字段表示序列化后的数据所属的类型，即数据的类型信息。
+在这里，`type.googleapis.com/user.v1.RegisterRequest` 表示序列化的数据属于 user.v1 包中的 RegisterRequest 结构体类型。
+
+`value`：
+这个字段包含序列化后的二进制数据，经过 Base64 编码。
+在这里，`CgYxMTExMTESCHN1cGVyMDA3GgYxMTExMTE=` 是经过 Base64 编码的序列化数据，通过解码可以得到详细的错误信息字符串。
+
 ## FAQ
 
 Q1: `github.com/golang/protobuf` 和 `google.golang.org/protobuf` 有什么区别？    
@@ -334,6 +395,7 @@ A: `github.com/golang/protobuf` 模块是原始的 Go protocol buffer API。
 
 Q2: 如果通过proto生成的结构体在访问http接口时，当返回值为零值的时候，json字段不显示如何处理？    
 A: 可以在message的字段中加入 `gogoproto.jsontag`， 示例如下：
+
 ```proto
 import "gogo/protobuf/gogo.proto";
 
