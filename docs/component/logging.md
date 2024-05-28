@@ -24,6 +24,10 @@ slug: /component/logging
 - 支持日志切割，按时间进行切割
 - 支持打印文件和行号
 
+## 接口与框架设计
+
+![logger-arch-design](/images/logger-arch-design.png)
+
 ## 接口定义
 
 为了方便适配不通的日志接入，这里定义了几个接口
@@ -150,6 +154,9 @@ type Logger interface {
 
 > 本地开发环境可以开启console、关闭日志，测试环境和生产环境只输出到文件
 
+## log 实例化流程
+
+![logger-instance](/images/logger-instance.png)
 
 ## 初始化日志
 
@@ -163,6 +170,12 @@ logger.Init()
 
 ...
 ```
+
+## 打印日志流程图
+
+整个打印日志的过程如下：
+
+![logger-flow](/images/logger-flow.png)
 
 ## 使用方式
 
@@ -219,3 +232,8 @@ SlowThreshold: 0
 ShowLog: false
 SlowThreshold: 200ms
 ```
+
+## References
+
+- https://zhuanlan.zhihu.com/p/672671600
+- https://www.luozhiyun.com/archives/542

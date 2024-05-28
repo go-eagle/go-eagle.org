@@ -12,8 +12,12 @@ keywords:
 slug: /getting-started/structure
 ---
 
-## 框架结构
+## 框架整体布局
 
 从功能上来看，eagle 的整体能力可以划分为四层
 
-图片待补充...
+![eagle-framework-layout](/images/eagle-framework-layout.png)
+
+## 框架分层结构
+
+![eagle-layout-arch](/images/eagle-layout-arch.png)
