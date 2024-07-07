@@ -13,7 +13,7 @@ keywords:
 
 ## 版本要求
 
-需要使用 eagle v1.3.0 以上版本
+需要使用 eagle v1.8.0 以上版本
 
 ## 环境准备
 
@@ -58,16 +58,34 @@ go install github.com/go-eagle/eagle/cmd/eagle
 
 ## 创建项目
 
+### 1. 只包含 http 服务
+
 ```bash
-// 创建新项目
+# 创建新项目
 eagle new eagle-demo 
+
+# 或
+eagle new github.com/foo/eagle-demo 
+```
+
+### 2. 包含 http 和 gRPC 服务
+
+```bash
+# 创建新项目
+eagle new -b=all eagle-demo 
+
+# 或
+eagle new -b=all github.com/foo/eagle-demo 
 ```
 
 ## 编译和运行
 
 ```bash
+# 编译
 make build
-./eagle-demo -c config/config.local.yaml
+
+# 运行，选择需要运行的服务
+eagle run
 ```
 
 ## 测试接口
@@ -82,4 +100,4 @@ curl 'http://127.0.0.1:8080/health'
 }
 ```
 
-恭喜💐，项目安装成功。
+恭喜💐，项目创建成功。

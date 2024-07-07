@@ -350,7 +350,7 @@ rabbitmq-plugins enable rabbitmq_mqtt
 rabbitmq-plugins enable rabbitmq_web_mqtt
 ```
 
-管理后台: <http://localhost:15672>  
+管理后台: http://localhost:15672
 默认账号: guest  
 默认密码: guest
 

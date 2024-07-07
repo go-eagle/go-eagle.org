@@ -12,29 +12,95 @@ keywords:
 slug: /deployment/go-deploy
 ---
 
+import Tabs from '@theme/Tabs';
+import TabItem from '@theme/TabItem';
+
 ## Go 环境安装
 
-下载地址：https://go.dev/dl/
+官方下载地址：
 
-下载具体安装包, 以下载Linux安装包为例
+- https://go.dev/dl/
+- https://golang.google.cn/dl/
 
-```bash
-$ wget https://golang.google.cn/dl/go1.17.10.linux-amd64.tar.gz
-```
+<Tabs>
+  <TabItem value="macOS(x86-64)" label="macOS(x86-64)" default>
 
-解压并安装
+  macOS 10.15 or later, Intel 64-bit processor
 
-```bash
-$ tar -xvzf go1.17.10.linux-amd64.tar.gz -C /usr/local
+    ```bash
+    $ wget https://go.dev/dl/go1.22.3.darwin-amd64.tar.gz
+    ```
+    解压并安装
 
-# 查看安装目录
-$ ll /usr/local/go
+    ```bash
+    $ tar -xvzf go1.22.3.darwin-amd64.tar.gz -C /usr/local
 
-# 查看安装的版本
-$ go version
-# Output
-go version go1.17.10 linux/amd64
-```
+    # 查看安装目录
+    $ ll /usr/local/go
+
+    # 查看安装的版本
+    $ go version
+    go version go1.22.3 darwin/amd64
+    ```
+  </TabItem>
+  <TabItem value="macOS(ARM64)" label="macOS(ARM64)">
+
+  macOS 11 or later, Apple 64-bit processor
+
+    ```bash
+    $ wget https://go.dev/dl/go1.22.3.darwin-arm64.tar.gz
+    ```
+    解压并安装
+
+    ```bash
+    $ tar -xvzf go1.22.3.darwin-arm64.tar.gz -C /usr/local
+
+    # 查看安装目录
+    $ ll /usr/local/go
+
+    # 查看安装的版本
+    $ go version
+    go version go1.22.3 darwin/arm64
+    ```
+  </TabItem>
+  <TabItem value="Linux" label="Linux">
+
+  Linux 2.6.32 or later, Intel 64-bit processor
+
+    ```bash
+    $ wget https://go.dev/dl/go1.22.3.linux-amd64.tar.gz
+    ```
+    解压并安装
+
+    ```bash
+    $ tar -xvzf go1.22.3.linux-amd64.tar.gz -C /usr/local
+
+    # 查看安装目录
+    $ ll /usr/local/go
+
+    # 查看安装的版本
+    $ go version
+    go version go1.22.3 linux/amd64
+    ```
+  </TabItem>
+  <TabItem value="Windows" label="Windows">
+
+  Windows 10 or later, Intel 64-bit processor
+
+    ```bash
+    $ wget https://go.dev/dl/go1.22.3.windows-amd64.msi
+    ```
+
+  默认情况下 `.msi` 文件会安装在 `C:\Go` 目录下，可选择自定义路径进行安装
+
+    ```bash
+    # 查看安装的版本
+    $ go version
+    # Output
+    go version go1.22.3 windows/amd64
+    ```
+  </TabItem>
+</Tabs>
 
 ## 环境变量配置
 

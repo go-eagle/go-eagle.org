@@ -1,0 +1,493 @@
+/* stylelint-disable docusaurus/copyright-header */
+/*
+ * Colors
+ */
+/*
+  * Sizes
+  */
+/*
+  * Fonts
+  */
+/*
+  * Buttons
+  */
+  .btn {
+    font-size: 1.2rem;
+    margin: 0 8px;
+    font-family: Arial;
+    border-radius: 6px;
+    padding: 0.8rem 2rem;
+    box-shadow: 3px 5px 20px rgba(0, 0, 0, 0.3);
+    background-color: #ebb147;
+    color: #fff6e6;
+    text-transform: uppercase;
+    border: solid 1px #ebb147;
+  }
+  .btn:hover {
+    text-decoration: none;
+    color: white;
+  }
+  .btnSecondary {
+    background-color: transparent;
+    color: #e6ebff;
+    text-transform: none;
+    border-color: #e6ebff;
+  }
+  @media (max-width: 576px) {
+    .btn {
+      display: inline-block;
+    }
+    .btnSecondary {
+      margin-top: 10px;
+    }
+  }
+  .masthead {
+    height: 500px;
+    background-color: #1c7cf2;
+    background-size: cover;
+    background-image: url("../img/background8.png");
+  }
+  @media (min-width: 1281px) {
+    .masthead {
+      height: 570px;
+    }
+  }
+  .masthead .content {
+    padding-top: 90px;
+    text-align: center;
+  }
+  @media (max-width: 880px) {
+    .masthead .content {
+      padding-top: 40px;
+    }
+  }
+  @media (max-width: 576px) {
+    .masthead .content {
+      padding-top: 40px;
+    }
+  }
+  @media (min-width: 1281px) {
+    .masthead .content {
+      padding-top: 120px;
+    }
+  }
+  .masthead h1 {
+    color: #e6ebff;
+    font-family: Arial;
+    font-size: 3.9rem;
+    font-weight: normal;
+    margin-bottom: 20px;
+  }
+  @media (max-width: 576px) {
+    .masthead h1 {
+      font-size: 40px;
+    }
+  }
+  .masthead h3 {
+    font-weight: normal;
+    font-size: 1.6rem;
+    font-family: Arial;
+    color: #e6ebff;
+    margin-bottom: 50px;
+  }
+  @media (max-width: 769px) {
+    .masthead h3 {
+      margin-bottom: 40px;
+    }
+  }
+  .masthead .githubBtns {
+    margin-top: 40px;
+  }
+  .masthead .githubBtns > * {
+    margin: 0 4px;
+  }
+  .screenshotContainer {
+    text-align: center;
+    background: linear-gradient(#abcbf3, 5%, #fafafa);
+  }
+  @media (max-width: 576px) {
+    .screenshotContainer {
+      background: linear-gradient(#abcbf3, 1%, #fafafa);
+    }
+  }
+  .screenshotContainer img {
+    margin-top: -70px;
+    width: 70%;
+    max-width: 1280px;
+    box-shadow: 3px 5px 20px rgba(0, 0, 0, 0.3);
+    border-radius: 4px;
+  }
+  @media (min-width: 1281px) {
+    .screenshotContainer img {
+      margin-top: -90px;
+    }
+  }
+  @media (max-width: 576px) {
+    .screenshotContainer img {
+      display: none;
+    }
+  }
+  .metricsSection {
+    padding: 80px 60px;
+    padding: 50px 60px;
+    background-color: #fafafa;
+  }
+  .metricsSection > div {
+    max-width: 1280px;
+    margin: auto;
+  }
+  .allInOneSection {
+    padding: 80px 60px;
+    background-image: url("../img/bg5.svg");
+    background-size: cover;
+  }
+  .allInOneSection > div {
+    max-width: 1280px;
+    margin: auto;
+  }
+  .allInOneSection h2 {
+    color: #e6ebff;
+    font-weight: bold;
+  }
+  .allInOneSection h3 {
+    color: #123763;
+  }
+  .allInOneSection p {
+    color: #e6ebff;
+    font-size: 1.05rem;
+  }
+  .allInOneSection .featuresWrapper {
+    margin-left: 40px;
+    margin-top: -calc($section-padding-y * 2 / 5);
+    margin-bottom: -calc($section-padding-y * 2 / 5);
+    padding-top: calc($section-padding-y * 2 / 5);
+    padding-bottom: calc($section-padding-y * 2 / 5);
+    background-color: #fafafa;
+    border-radius: 5px;
+    box-shadow: rgba(17, 17, 26, 0.1) 0px 4px 16px, rgba(17, 17, 26, 0.1) 0px 8px 24px, rgba(17, 17, 26, 0.1) 0px 16px 56px;
+  }
+  @media (max-width: 769px) {
+    .allInOneSection .featuresWrapper {
+      margin-left: 0;
+      margin-top: 0;
+      margin-bottom: 0;
+    }
+  }
+  .allInOneSection .featuresWrapper p {
+    color: black;
+  }
+  .architectureSection {
+    padding: 80px 60px;
+    background-color: #fafafa;
+  }
+  .architectureSection > div {
+    max-width: 1280px;
+    margin: auto;
+  }
+  .architectureSection h2 {
+    color: #1c7cf2;
+    font-weight: normal;
+  }
+  .architectureSection p {
+    color: black;
+  }
+  .typescriptSection {
+    padding: 80px 60px;
+    background-color: #1770de;
+  }
+  .typescriptSection > div {
+    max-width: 1280px;
+    margin: auto;
+  }
+  .typescriptSection h2 {
+    color: #e6ebff;
+    font-weight: bold;
+  }
+  .typescriptSection p {
+    color: #e6ebff;
+    font-size: 1.05rem;
+  }
+  .testimonialsSection {
+    padding: 80px 60px;
+    background-color: #fafafa;
+  }
+  .testimonialsSection > div {
+    max-width: 1280px;
+    margin: auto;
+  }
+  .getStartedSection {
+    padding: 80px 60px;
+    padding: 50px 60px;
+    background-color: #fafafa;
+  }
+  .getStartedSection > div {
+    max-width: 1280px;
+    margin: auto;
+  }
+  .metrics {
+    display: flex;
+    justify-content: space-around;
+    color: #001e42;
+  }
+  @media (max-width: 576px) {
+    .metrics {
+      flex-direction: column;
+    }
+    .metrics > div {
+      margin-bottom: 10px;
+    }
+  }
+  .metrics > div {
+    display: flex;
+    align-items: center;
+  }
+  @media (max-width: 769px) {
+    .metrics > div {
+      flex-direction: column;
+    }
+  }
+  @media (max-width: 576px) {
+    .metrics > div {
+      padding-bottom: 20px;
+    }
+  }
+  .metrics .number {
+    font-family: Arial;
+    letter-spacing: 0.04rem;
+    font-size: 30px;
+    font-family: arial;
+    font-weight: bold;
+    color: #18375d;
+  }
+  .metrics .number .plus {
+    margin-left: 2px;
+  }
+  .metrics .caption {
+    font-family: Arial;
+    letter-spacing: 0.04rem;
+    line-height: 15px;
+    font-size: 15px;
+    margin-left: 10px;
+  }
+  @media (max-width: 769px) {
+    .metrics .caption {
+      margin-left: 0;
+    }
+  }
+  .feature {
+    display: flex;
+  }
+  @media (max-width: 769px) {
+    .feature {
+      flex-direction: column;
+    }
+  }
+  .feature h2 {
+    font-family: Arial;
+    letter-spacing: 0.04rem;
+    margin-bottom: 30px;
+    font-size: 1.9rem;
+    letter-spacing: 0.05rem;
+  }
+  .feature p {
+    font-family: Arial;
+    letter-spacing: 0.04rem;
+  }
+  .feature .col1 {
+    flex: 4;
+  }
+  .feature .col2 {
+    flex: 7;
+  }
+  .featureRow {
+    display: flex;
+  }
+  @media (max-width: 769px) {
+    .featureRow {
+      padding-top: 20px;
+      padding-left: 0;
+    }
+  }
+  @media (max-width: 576px) {
+    .featureRow {
+      flex-direction: column;
+    }
+  }
+  .featureRow .featureCell {
+    padding: 0 20px;
+    flex: 1;
+    display: flex;
+  }
+  .featureRow .featureSymbol {
+    margin-top: -5px;
+    color: #20c10b;
+  }
+  .featureRow .featureContent {
+    flex: 1;
+    padding-left: 12px;
+  }
+  .featureRow .featureContent h3 {
+    font-family: Arial;
+    letter-spacing: 0.04rem;
+    font-weight: normal;
+    margin-bottom: 15px;
+    font-size: 1rem;
+  }
+  @media (min-width: 1281px) {
+    .featureRow .featureContent h3 {
+      margin-bottom: 20px;
+    }
+  }
+  .featureRow .featureContent p {
+    font-family: Arial;
+    letter-spacing: 0.04rem;
+    margin-bottom: 30px;
+    font-size: 0.9rem;
+  }
+  @media (min-width: 1281px) {
+    .featureRow .featureContent p {
+      margin-bottom: 40px;
+    }
+  }
+  .featureRow .featureContent p :last-of-type {
+    margin-bottom: 0;
+  }
+  .featureRow:last-of-type .featureContent p {
+    margin-bottom: 0;
+  }
+  .architectureWrapper, .typescriptWrapper {
+    height: 100%;
+  }
+  .architectureWrapper {
+    padding-left: 60px;
+    padding-right: 30px;
+    text-align: center;
+  }
+  @media (max-width: 769px) {
+    .architectureWrapper {
+      padding: 0;
+      padding-top: 40px;
+    }
+  }
+  @media (max-width: 576px) {
+    .architectureWrapper {
+      display: none;
+    }
+  }
+  .architectureWrapper > img {
+    max-width: 75%;
+  }
+  .typescriptWrapper {
+    padding-right: 60px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+  @media (max-width: 769px) {
+    .typescriptWrapper {
+      padding: 0;
+      padding-bottom: 40px;
+    }
+  }
+  .typescriptWrapper > div {
+    height: 100%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+  }
+  .typescriptWrapper > div > strong {
+    color: #e6ebff;
+    font-weight: 500;
+    font-size: 6rem;
+  }
+  @media (max-width: 576px) {
+    .typescriptWrapper > div > strong {
+      display: none;
+    }
+  }
+  .typescriptWrapper > div > svg {
+    height: 6rem;
+    margin-right: 20px;
+    fill: #e6ebff;
+  }
+  .codeImage {
+    border-radius: 20px;
+    background-color: #1e1e1e;
+    padding: 10px;
+    padding-bottom: 12px;
+    box-shadow: rgba(100, 100, 111, 0.2) 0px 7px 29px 0px;
+  }
+  .testimonials h2 {
+    text-align: center;
+    font-family: Arial;
+    color: #1c7cf2;
+    margin-bottom: 0;
+  }
+  .testimonials .content {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: space-around;
+  }
+  .testimonials .card {
+    padding: 20px;
+    border-radius: 10px;
+    width: 320px;
+    box-shadow: rgba(100, 100, 111, 0.2) 0px 7px 29px 0px;
+    margin-top: 60px;
+    display: flex;
+    flex-direction: column;
+  }
+  .testimonials .card .title {
+    font-size: 1.1rem;
+    font-weight: bold;
+    color: #123763;
+    margin-bottom: 25px;
+  }
+  .testimonials .card .testimonial {
+    font-family: Arial;
+    font-style: italic;
+    margin-bottom: 20px;
+    flex: 1;
+  }
+  .testimonials .card .author {
+    font-weight: bold;
+    font-family: Arial;
+    font-size: 0.9rem;
+    color: #123763;
+  }
+  .testimonials .card .author .job {
+    font-weight: normal;
+  }
+  .getStarted {
+    text-align: center;
+  }
+  .footerWrapper {
+    color: #a7acbe;
+    background-color: #505864;
+    box-shadow: rgba(50, 50, 93, 0.25) 0px 30px 60px -12px inset, rgba(0, 0, 0, 0.3) 0px 18px 36px -18px inset;
+    padding: 20px;
+  }
+  .footerWrapper .footer {
+    display: flex;
+    justify-content: center;
+  }
+  .footerWrapper .githubLink:before, .footerWrapper .twitterLink:before, .footerWrapper .youtubeLink:before, .footerWrapper .chatLink:before {
+    content: "";
+    width: 22px;
+    height: 22px;
+    margin: 0 10px;
+    display: flex;
+  }
+  .footerWrapper .githubLink:before {
+    background: url("data:image/svg+xml;charset=utf-8,%3Csvg viewBox='0 0 496 512' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath fill='white' d='M165.9 397.4c0 2-2.3 3.6-5.2 3.6-3.3.3-5.6-1.3-5.6-3.6 0-2 2.3-3.6 5.2-3.6 3-.3 5.6 1.3 5.6 3.6zm-31.1-4.5c-.7 2 1.3 4.3 4.3 4.9 2.6 1 5.6 0 6.2-2s-1.3-4.3-4.3-5.2c-2.6-.7-5.5.3-6.2 2.3zm44.2-1.7c-2.9.7-4.9 2.6-4.6 4.9.3 2 2.9 3.3 5.9 2.6 2.9-.7 4.9-2.6 4.6-4.6-.3-1.9-3-3.2-5.9-2.9zM244.8 8C106.1 8 0 113.3 0 252c0 110.9 69.8 205.8 169.5 239.2 12.8 2.3 17.3-5.6 17.3-12.1 0-6.2-.3-40.4-.3-61.4 0 0-70 15-84.7-29.8 0 0-11.4-29.1-27.8-36.6 0 0-22.9-15.7 1.6-15.4 0 0 24.9 2 38.6 25.8 21.9 38.6 58.6 27.5 72.9 20.9 2.3-16 8.8-27.1 16-33.7-55.9-6.2-112.3-14.3-112.3-110.5 0-27.5 7.6-41.3 23.6-58.9-2.6-6.5-11.1-33.3 2.6-67.9 20.9-6.5 69 27 69 27 20-5.6 41.5-8.5 62.8-8.5s42.8 2.9 62.8 8.5c0 0 48.1-33.6 69-27 13.7 34.7 5.2 61.4 2.6 67.9 16 17.7 25.8 31.5 25.8 58.9 0 96.5-58.9 104.2-114.8 110.5 9.2 7.9 17 22.9 17 46.4 0 33.7-.3 75.4-.3 83.6 0 6.5 4.6 14.4 17.3 12.1C428.2 457.8 496 362.9 496 252 496 113.3 383.5 8 244.8 8zM97.2 352.9c-1.3 1-1 3.3.7 5.2 1.6 1.6 3.9 2.3 5.2 1 1.3-1 1-3.3-.7-5.2-1.6-1.6-3.9-2.3-5.2-1zm-10.8-8.1c-.7 1.3.3 2.9 2.3 3.9 1.6 1 3.6.7 4.3-.7.7-1.3-.3-2.9-2.3-3.9-2-.6-3.6-.3-4.3.7zm32.4 35.6c-1.6 1.3-1 4.3 1.3 6.2 2.3 2.3 5.2 2.6 6.5 1 1.3-1.3.7-4.3-1.3-6.2-2.2-2.3-5.2-2.6-6.5-1zm-11.4-14.7c-1.6 1-1.6 3.6 0 5.9 1.6 2.3 4.3 3.3 5.6 2.3 1.6-1.3 1.6-3.9 0-6.2-1.4-2.3-4-3.3-5.6-2z'/%3E%3C/svg%3E") no-repeat;
+  }
+  .footerWrapper .twitterLink:before {
+    background: url("data:image/svg+xml;charset=utf-8,%3Csvg viewBox='0 0 512 512' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath fill='white' d='M459.37 151.716c.325 4.548.325 9.097.325 13.645 0 138.72-105.583 298.558-298.558 298.558-59.452 0-114.68-17.219-161.137-47.106 8.447.974 16.568 1.299 25.34 1.299 49.055 0 94.213-16.568 130.274-44.832-46.132-.975-84.792-31.188-98.112-72.772 6.498.974 12.995 1.624 19.818 1.624 9.421 0 18.843-1.3 27.614-3.573-48.081-9.747-84.143-51.98-84.143-102.985v-1.299c13.969 7.797 30.214 12.67 47.431 13.319-28.264-18.843-46.781-51.005-46.781-87.391 0-19.492 5.197-37.36 14.294-52.954 51.655 63.675 129.3 105.258 216.365 109.807-1.624-7.797-2.599-15.918-2.599-24.04 0-57.828 46.782-104.934 104.934-104.934 30.213 0 57.502 12.67 76.67 33.137 23.715-4.548 46.456-13.32 66.599-25.34-7.798 24.366-24.366 44.833-46.132 57.827 21.117-2.273 41.584-8.122 60.426-16.243-14.292 20.791-32.161 39.308-52.628 54.253z'/%3E%3C/svg%3E") no-repeat;
+  }
+  .footerWrapper .youtubeLink:before {
+    background: url("data:image/svg+xml;charset=utf-8,%3Csvg viewBox='0 0 576 512' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath fill='white' d='M549.655 124.083c-6.281-23.65-24.787-42.276-48.284-48.597C458.781 64 288 64 288 64S117.22 64 74.629 75.486c-23.497 6.322-42.003 24.947-48.284 48.597-11.412 42.867-11.412 132.305-11.412 132.305s0 89.438 11.412 132.305c6.281 23.65 24.787 41.5 48.284 47.821C117.22 448 288 448 288 448s170.78 0 213.371-11.486c23.497-6.321 42.003-24.171 48.284-47.821 11.412-42.867 11.412-132.305 11.412-132.305s0-89.438-11.412-132.305zm-317.51 213.508V175.185l142.739 81.205-142.739 81.201z'/%3E%3C/svg%3E") no-repeat;
+  }
+  .footerWrapper .chatLink:before {
+    background: url("data:image/svg+xml;charset=utf-8,%3Csvg viewBox='0 0 448 512' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath fill='white' d='M297.216 243.2c0 15.616-11.52 28.416-26.112 28.416-14.336 0-26.112-12.8-26.112-28.416s11.52-28.416 26.112-28.416c14.592 0 26.112 12.8 26.112 28.416zm-119.552-28.416c-14.592 0-26.112 12.8-26.112 28.416s11.776 28.416 26.112 28.416c14.592 0 26.112-12.8 26.112-28.416.256-15.616-11.52-28.416-26.112-28.416zM448 52.736V512c-64.494-56.994-43.868-38.128-118.784-107.776l13.568 47.36H52.48C23.552 451.584 0 428.032 0 398.848V52.736C0 23.552 23.552 0 52.48 0h343.04C424.448 0 448 23.552 448 52.736zm-72.96 242.688c0-82.432-36.864-149.248-36.864-149.248-36.864-27.648-71.936-26.88-71.936-26.88l-3.584 4.096c43.52 13.312 63.744 32.512 63.744 32.512-60.811-33.329-132.244-33.335-191.232-7.424-9.472 4.352-15.104 7.424-15.104 7.424s21.248-20.224 67.328-33.536l-2.56-3.072s-35.072-.768-71.936 26.88c0 0-36.864 66.816-36.864 149.248 0 0 21.504 37.12 78.08 38.912 0 0 9.472-11.52 17.152-21.248-32.512-9.728-44.8-30.208-44.8-30.208 3.766 2.636 9.976 6.053 10.496 6.4 43.21 24.198 104.588 32.126 159.744 8.96 8.96-3.328 18.944-8.192 29.44-15.104 0 0-12.8 20.992-46.336 30.464 7.68 9.728 16.896 20.736 16.896 20.736 56.576-1.792 78.336-38.912 78.336-38.912z'/%3E%3C/svg%3E") no-repeat;
+  }
+  

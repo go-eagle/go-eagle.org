@@ -76,7 +76,7 @@ option java_package = "com.github.eagle.<package_name>.<version>";
 
 ## Version
 
-该版本号为标注不兼容版本，并且会在<package_name>中进行区分，当接口需要重构时一般会更新不兼容结构；
+该版本号为标注不兼容版本，并且会在 `package_name` 中进行区分，当接口需要重构时一般会更新不兼容结构；
 
 ## Import
 

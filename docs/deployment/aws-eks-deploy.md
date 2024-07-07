@@ -1,6 +1,6 @@
 ---
 id: aws-eks-deploy
-title: 部署应用到aws eks集群
+title: 部署到k8s集群
 description: 部署到aws的eks集群
 keywords:
   - Go
@@ -13,6 +13,8 @@ slug: /deployment/aws-eks-deploy
 ---
 
 ## 创建EKS集群
+
+本节主要介绍如何开通和配置 AWS 的 EKS, 并如何将应用部署到 EKS 及群里。
 
 ### 配置集群基本信息
 

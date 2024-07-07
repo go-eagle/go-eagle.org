@@ -200,4 +200,4 @@ OK, 这样task就会按照指定的方式运行了。
 
 ## Reference
 
-- <https://github.com/hibiken/asynq>
+- https://github.com/hibiken/asynq

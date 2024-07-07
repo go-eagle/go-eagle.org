@@ -47,6 +47,7 @@ Usage:
 
 Available Commands:
   cache       Generate the cache file
+  handler     Generate the handler file
   help        Help about any command
   model       Generate the model file
   new         Create a project template

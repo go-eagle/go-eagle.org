@@ -1,10 +1,9 @@
-import React from 'react';
 import Layout from '@theme/Layout';
 import Link from '@docusaurus/Link';
 import useDocusaurusContext from '@docusaurus/useDocusaurusContext';
 import useBaseUrl from '@docusaurus/useBaseUrl';
 import GitHubButton from 'react-github-btn';
-import styles from './index.module.scss';
+import styles from './index.module.css';
 
 function FeatureCell(props) {
   return (
@@ -36,7 +35,7 @@ function Testimonial(props) {
   );
 }
 
-function Home() {
+function Home(): JSX.Element {
   const context = useDocusaurusContext();
   return (
     <Layout  
