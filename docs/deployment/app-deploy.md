@@ -84,32 +84,48 @@ journalctl -u user-service.service
 
 ### 使用 Supervisord
 
-> 这里日志目录设定为 /data/logs 如果安装了 Supervisord
+> 这里日志目录设定为 /data/logs
 
-在配置文件 `/etc/supervisor/supervisord.conf` 中加入以下配置
+1. 安装 supervisord
+
+```bash
+sudo apt-get update
+sudo apt-get install supervisor
+```
+2. 创建 supervisord 配置文件
+
+配置文件通常位于 `/etc/supervisor/conf.d/` 目录下。创建一个新的配置文件: `/etc/supervisor/supervisord.conf` 中加入以下配置
 
 ```ini
-[program:eagle]
+[program:user-service]
+user=www
 # environment=
-directory=/home/go/eagle
-command=/home/go/eagle/bin_eagle
+# directory=/home/go/eagle
+command=/data/www/user-service/bin/user-service -p 8080 -c /data/www/user-service/conf/config-test.yaml -l /data/logs/user-service
 autostart=true
 autorestart=true
-user=root
-stdout_logfile=/data/logs/eagle_std.log
+stdout_logfile=/data/logs/user-service/supervisor_std.log
 startsecs = 2
 startretries = 2
 stdout_logfile_maxbytes=10MB
 stdout_logfile_backups=10
-stderr_logfile=/data/logs/eagle_err.log
+stderr_logfile=/data/logs/user-service/supervisor_err.log
 stderr_logfile_maxbytes=10MB
 stderr_logfile_backups=10
 ```
 
-重启 Supervisord
+3. 启动和管理服务
 
 ```bash
-supervisorctl restart eagle
+# 重新加载
+sudo supervisorctl reread   # 重新读取配置文件，检查更改
+sudo supervisorctl update   # 应用新的配置，启动或停止相应的程序
+
+# 启动服务
+sudo supervisorctl start user-service
+
+# 查看状态
+sudo supervisorctl status user-service
 ```
 
 ## Dockerfile
