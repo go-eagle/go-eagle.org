@@ -168,7 +168,11 @@ server2 ansible_host=192.168.1.2 ansible_user=user
 
 1. Jenkins 已安装并运行。
 2. 目标机器（要部署的机器）配置了 SSH，并能从 Jenkins 服务器上通过 SSH 访问。
-3. Go 已安装在目标机器上。(非必须)
+3. Go 已安装在目标机器上。
+4. 安装 Git: `yum install git -y`
+5. Jenkins-master 上安装 docker
+
+> 安装docker: yum install docker-ce docker-ce-cli containerd.io docker-buildx-plugin docker-compose-plugin
 
 ### 步骤 1：在 Jenkins 上安装必要的插件
 
@@ -193,6 +197,10 @@ server2 ansible_host=192.168.1.2 ansible_user=user
 pipeline {
     agent any
 
+    tools {
+       go 'go-1.21.3'
+    }
+
     environment {
         // 配置目标机器的 SSH 凭据 ID
         REMOTE_HOST = 'user@your-remote-host'
@@ -208,12 +216,44 @@ pipeline {
             }
         }
 
+        stage('Unit Test') {
+            steps {
+                sh 'make test'
+            }
+        }
+
+        stage('Coverage Report') {
+            steps {
+                sh 'make cover'
+                sh 'make view-cover'
+            }
+        }
+
         stage('Build') {
             steps {
                 // 在本地构建 Go 项目
-                sh 'go mod tidy'
-                sh 'go build -o my_go_project'
+                sh 'make build'
             }
+        }
+
+        stage('Build Docker Image') {
+            steps {
+                // 在本地构建 Go 项目
+                sh 'make docker'
+            }
+        }
+
+        stage('Push Docker Image') {
+           steps {
+               script {
+                   withCredentials([usernamePassword(credentialsId: 'DOCKER_REGISTRY_CREDENTIALS_ID', usernameVariable: 'DOCKER_USERNAME', passwordVariable: 'DOCKER_PASSWORD')]) {
+                       sh """
+                           echo $DOCKER_PASSWORD | docker login --username $DOCKER_USERNAME --password-stdin
+                           docker push eagle/
+                       """
+                   }
+               }
+           }
         }
 
         stage('Deploy') {
