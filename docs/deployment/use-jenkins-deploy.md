@@ -1,6 +1,8 @@
 
 
-将一个 Go 项目使用 Jenkins 部署到指定的机器上是一个多步骤的过程，包括配置 Jenkins、编写 Jenkinsfile、设置远程机器的环境等。以下是一个完整的方案：
+将一个 Go 项目使用 Jenkins 部署到指定的机器上或k8s是一个多步骤的过程，包括配置 Jenkins、编写 shell 或 Jenkinsfile、设置远程机器的环境等。
+
+分别从部署到ECS和k8s, 以下是具体的步骤：
 
 ## 部署到ECS
 
@@ -8,7 +10,109 @@
 
 1. Jenkins 已安装并运行。
 2. 目标机器（要部署的机器）配置了 SSH，并能从 Jenkins 服务器上通过 SSH 访问。
-3. Go 已安装在目标机器上。
+3. Go 已安装在目标机器上。(非必须)
+
+### 步骤 1：在 Jenkins 上安装必要的插件
+
+安装以下 Jenkins 插件：
+
+- SSH Agent Plugin
+- Ansible Plugin
+
+### 步骤 2：配置 Jenkins 凭据
+
+在 Jenkins 中添加 SSH 凭据（SSH Username with Private Key）：
+
+1. 在 Jenkins 管理页面，选择 “Credentials”。
+2. 选择合适的域，点击 “Add Credentials”。
+3. 选择 “SSH Username with private key”，并填写相关信息（用户名、私钥等）。
+
+### 步骤 3：配置 Ansible
+
+需要确保 Ansible 已安装在 Jenkins 主机上，并且配置了 Ansible 的 inventory 文件来管理目标机器。
+
+### 步骤 4: 配置 Freestyle 项目
+
+#### 1. 创建新的 Freestyle 项目
+
+在 Jenkins 主页面，点击 “新建任务”，选择 “Freestyle project”，然后点击 “OK”。
+
+#### 2. 配置源码管理
+
+在 “源码管理” 部分，配置您的代码仓库（例如，使用 Git）, 同时添加git的账号、密码，如果是使用ssh 需要配置对应的public key.
+
+#### 3. 添加构建步骤
+
+在 “构建” 部分，点击 “添加构建步骤”，选择 “Execute shell”。
+
+添加具体要执行的命令，比如
+
+```bash
+make build
+```
+
+#### 4. 继续添加构建操作
+
+点击 “添加构建操作”，选择 “Ansible Playbook”。
+
+在 Ansible Playbook 配置中：
+
+- Path to Playbook：填写您的 Ansible Playbook 文件路径，例如 /path/to/playbook.yml。
+- Inventory：填写您的 Ansible inventory 文件路径，例如 /path/to/inventory。
+- Credentials：选择之前配置的 SSH 凭据。
+
+#### 5. 编写 Ansible Playbook
+
+```yaml
+---
+- name: Distribute and run Go binary
+  hosts: all
+  tasks:
+    - name: Copy Go binary to target machines
+      copy:
+        src: /path/to/compiled/binary/my_go_project
+        dest: /path/to/destination/my_go_project
+        mode: '0755'
+
+    - name: Copy configuration file to target machines
+      copy:
+        src: /path/to/config/config.yaml
+        dest: /path/to/destination/config.yaml
+        mode: '0644'
+
+    - name: Run Go binary on target machines
+      shell: nohup /path/to/destination/my_go_project > /dev/null 2>&1 &
+      async: 0
+      poll: 0
+
+```
+
+#### 6. 配置 Ansible inventory 文件
+
+在 Jenkins 主机上创建一个 Ansible inventory 文件（例如 /path/to/inventory），其中包含目标机器的信息，例如：
+
+```ini
+[all]
+server1 ansible_host=192.168.1.1 ansible_user=user
+server2 ansible_host=192.168.1.2 ansible_user=user
+
+```
+
+#### 7. 保存并构建项目
+
+点击 “保存” 按钮保存 Jenkins 项目的配置，然后点击 “立即构建” 以启动构建过程。
+
+如果构建结束后是绿色的对钩，恭喜，构建成功。
+
+如果是需要将应用部署到 k8s, 请继续往下看。
+
+## 部署到 k8s
+
+### 前提条件
+
+1. Jenkins 已安装并运行。
+2. 目标机器（要部署的机器）配置了 SSH，并能从 Jenkins 服务器上通过 SSH 访问。
+3. Go 已安装在目标机器上。(非必须)
 
 ### 步骤 1：在 Jenkins 上安装必要的插件
 
@@ -102,8 +206,4 @@ pipeline {
 1. 在 Jenkins 上创建一个新的 Pipeline 项目。
 2. 在项目配置中，将 Pipeline script from SCM 选项设置为 Jenkinsfile。
 3. 保存并构建项目。
-
-## 部署到 k8s
-
-
 
