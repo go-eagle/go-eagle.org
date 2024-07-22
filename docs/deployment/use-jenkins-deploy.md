@@ -76,7 +76,8 @@ CONFIG_FILE=$PROJECT_DIR/config/config.yaml
 make build
 
 # 分发到相应机器上
-ansible-playbook -i /etc/ansible/hosts /etc/ansible/roles/deploy-go-service/deploy-go-service.yaml -e 'service_name=user-web-service service_port=8080 env=prod build_work=/data/jenkins_home/workspace/ops-deploy-go-service' -uroot -vv
+ansible-playbook -i /etc/ansible/hosts /etc/ansible/roles/deploy-go-service/deploy-go-service.yaml \
+-e 'service_name=user-web-service service_port=8080 env=prod build_work=/data/jenkins_home/workspace/ops-deploy-go-service' -uroot -vv
 ```
 
 #### 4. 继续添加构建操作
