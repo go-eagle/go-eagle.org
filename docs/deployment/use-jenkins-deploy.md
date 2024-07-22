@@ -9,9 +9,10 @@
 ### 前提条件
 
 1. Jenkins 已安装并运行。
-2. Jenkins机器上安装ansible
+2. Jenkins 机器上安装 ansible
 3. 目标机器（要部署的机器）配置了 SSH，并能从 Jenkins 服务器上通过 SSH 访问。
 4. Go 已安装在目标机器上，供编译使用。
+5. systemd (通常已经安装在大多数 Linux 发行版中)
 
 ### 步骤 1：在 Jenkins 上安装必要的插件
 
@@ -61,7 +62,19 @@ sudo visudo
 添加具体要执行的命令，比如
 
 ```bash
+# 设置 Go 环境变量
+export GOPATH=$HOME/go
+export PATH=$PATH:/usr/local/go/bin:$GOPATH/bin
+
+# 设置项目路径
+PROJECT_DIR=$WORKSPACE
+BINARY_NAME=my_go_website
+BUILD_DIR=$PROJECT_DIR/build
+CONFIG_FILE=$PROJECT_DIR/config/config.yaml
+
+# 编译 Go 项目
 make build
+
 ansible-playbook -i /tmp/dev-hlists /etc/ansible/roles/deploy-go-service/deploy-go-service.yaml -e 'service_name=user-web-service service_port=8080 env=prod build_work=/data/jenkins_home/workspace/ops-deploy-go-service' -uroot -vv
 ```
 
@@ -77,23 +90,11 @@ ansible-playbook -i /tmp/dev-hlists /etc/ansible/roles/deploy-go-service/deploy-
 
 #### 5. 编写 Ansible Playbook
 
+主要目的：使用 Ansible 将编译好的二进制文件和配置文件分发到目标机器，并配置 systemd 服务文件。
+
 ansible 推荐都是以role模板格式作为playbook来实现非常强大的功能, 模板推荐：https://galaxy.ansible.com/
 
 > ansible 官方文档：https://docs.ansible.com/ansible/latest/index.html
-
-hosts 配置如下，默认的 Inventory：/etc/ansible/hosts
-
-> Inventory文件格式: 最常见的格式是 INI 和 YAML 格式, 常用的是 INI
-
-```ini
-# /etc/ansible/hosts
-[dev] // 组名
-10.9.X.A ansible_connection=ssh ansible_ssh_user=work
-
-[prod]
-10.42.X.B ansible_connection=ssh ansible_ssh_user=work
-10.42.X.C ansible_connection=ssh ansible_ssh_user=work
-```
 
 ```yaml
 # /etc/ansible/roles/deploy-go-service/deploy-go-service.yml
@@ -115,20 +116,32 @@ hosts 配置如下，默认的 Inventory：/etc/ansible/hosts
         mode: '0644'
 
     - name: Setup systemd service for the Go application
-      shell: nohup /path/to/destination/my_go_project > /dev/null 2>&1 &
-      async: 0
-      poll: 0
+      command: systemctl start my_go_service
 
     - name: Reload systemd and restart Go application service
-      shell: nohup /path/to/destination/my_go_project > /dev/null 2>&1 &
-      async: 0
-      poll: 0
-
+      command: systemctl restart my_go_service
+      
 ```
 
 #### 6. 配置 Ansible inventory 文件
 
 在 Jenkins 主机上创建一个 Ansible inventory 文件（例如 /path/to/inventory），其中包含目标机器的信息，例如：
+
+Ansible inventory 即 hosts， 配置如下，默认的 Inventory：/etc/ansible/hosts
+
+> Inventory文件格式: 最常见的格式是 INI 和 YAML 格式, 常用的是 INI
+
+```ini
+# /etc/ansible/hosts
+[dev] // 组名
+10.9.X.A ansible_connection=ssh ansible_ssh_user=work
+
+[prod]
+10.42.X.B ansible_connection=ssh ansible_ssh_user=work
+10.42.X.C ansible_connection=ssh ansible_ssh_user=work
+```
+
+或
 
 ```ini
 [all]
