@@ -9,8 +9,9 @@
 ### 前提条件
 
 1. Jenkins 已安装并运行。
-2. 目标机器（要部署的机器）配置了 SSH，并能从 Jenkins 服务器上通过 SSH 访问。
-3. Go 已安装在目标机器上。(非必须)
+2. Jenkins机器上安装ansible
+3. 目标机器（要部署的机器）配置了 SSH，并能从 Jenkins 服务器上通过 SSH 访问。
+4. Go 已安装在目标机器上。(非必须)
 
 ### 步骤 1：在 Jenkins 上安装必要的插件
 
@@ -27,9 +28,21 @@
 2. 选择合适的域，点击 “Add Credentials”。
 3. 选择 “SSH Username with private key”，并填写相关信息（用户名、私钥等）。
 
-### 步骤 3：配置 Ansible
+### 步骤 3：安装和配置 Ansible
 
 需要确保 Ansible 已安装在 Jenkins 主机上，并且配置了 Ansible 的 inventory 文件来管理目标机器。
+
+`sudo apt install python ansible -y`
+
+同时添加一个 ansible 的专属用户
+
+```bash
+sudo useradd ansible-admin
+sudo passwd ansible-admin
+sudo visudo
+```
+
+将 Add “ansible-admin ALL=(ALL) ALL” to this sudoers file.
 
 ### 步骤 4: 配置 Freestyle 项目
 
@@ -49,6 +62,7 @@
 
 ```bash
 make build
+ansible-playbook -i /tmp/dev-hlists /etc/ansible/roles/deploy-go-service/deploy-go-service.yaml -e 'service_name=user-web-service service_port=8080 env=prod build_work=/data/jenkins_home/workspace/ops-deploy-go-service' -uroot -vv
 ```
 
 #### 4. 继续添加构建操作
@@ -63,9 +77,15 @@ make build
 
 #### 5. 编写 Ansible Playbook
 
+ansible 推荐都是以role模板格式作为playbook来实现非常强大的功能, 模板推荐：https://galaxy.ansible.com/
+
+> ansible 官方文档：https://docs.ansible.com/ansible/latest/index.html
+
 ```yaml
+# /etc/ansible/roles/deploy-go-service/deploy-go-service.yml
 ---
 - name: Distribute and run Go binary
+  # 要操作的机器组，在文件 /etc/ansible/hosts 进行配置
   hosts: all
   tasks:
     - name: Copy Go binary to target machines
@@ -80,7 +100,12 @@ make build
         dest: /path/to/destination/config.yaml
         mode: '0644'
 
-    - name: Run Go binary on target machines
+    - name: Setup systemd service for the Go application
+      shell: nohup /path/to/destination/my_go_project > /dev/null 2>&1 &
+      async: 0
+      poll: 0
+
+    - name: Reload systemd and restart Go application service
       shell: nohup /path/to/destination/my_go_project > /dev/null 2>&1 &
       async: 0
       poll: 0
