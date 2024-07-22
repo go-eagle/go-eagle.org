@@ -11,7 +11,7 @@
 1. Jenkins 已安装并运行。
 2. Jenkins机器上安装ansible
 3. 目标机器（要部署的机器）配置了 SSH，并能从 Jenkins 服务器上通过 SSH 访问。
-4. Go 已安装在目标机器上。(非必须)
+4. Go 已安装在目标机器上，供编译使用。
 
 ### 步骤 1：在 Jenkins 上安装必要的插件
 
@@ -80,6 +80,20 @@ ansible-playbook -i /tmp/dev-hlists /etc/ansible/roles/deploy-go-service/deploy-
 ansible 推荐都是以role模板格式作为playbook来实现非常强大的功能, 模板推荐：https://galaxy.ansible.com/
 
 > ansible 官方文档：https://docs.ansible.com/ansible/latest/index.html
+
+hosts 配置如下，默认的 Inventory：/etc/ansible/hosts
+
+> Inventory文件格式: 最常见的格式是 INI 和 YAML 格式, 常用的是 INI
+
+```ini
+# /etc/ansible/hosts
+[dev] // 组名
+10.9.X.A ansible_connection=ssh ansible_ssh_user=work
+
+[prod]
+10.42.X.B ansible_connection=ssh ansible_ssh_user=work
+10.42.X.C ansible_connection=ssh ansible_ssh_user=work
+```
 
 ```yaml
 # /etc/ansible/roles/deploy-go-service/deploy-go-service.yml
@@ -231,4 +245,9 @@ pipeline {
 1. 在 Jenkins 上创建一个新的 Pipeline 项目。
 2. 在项目配置中，将 Pipeline script from SCM 选项设置为 Jenkinsfile。
 3. 保存并构建项目。
+
+## References
+
+- https://blog.wangriyu.wang/2018/08-Jenkins.html
+- https://desistdaydream.github.io/docs/9.%E8%BF%90%E7%BB%B4/Ansible/Inventory-%E9%85%8D%E7%BD%AE%E6%96%87%E4%BB%B6%E8%AF%A6%E8%A7%A3/
 
