@@ -73,6 +73,8 @@ BUILD_DIR=$PROJECT_DIR/build
 CONFIG_FILE=$PROJECT_DIR/config/config.yaml
 
 # 编译 Go 项目
+echo "Building Go project..."
+cd $PROJECT_DIR
 make build
 
 # 分发到相应机器上
