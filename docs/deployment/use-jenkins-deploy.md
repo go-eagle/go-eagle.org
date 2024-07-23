@@ -20,6 +20,7 @@
 
 - SSH Agent Plugin
 - Ansible Plugin
+- Go Plugin
 
 ### 步骤 2：配置 Jenkins 凭据
 
@@ -180,6 +181,7 @@ server2 ansible_host=192.168.1.2 ansible_user=user
 
 - SSH Agent Plugin
 - Pipeline Plugin (用于 Jenkinsfile 支持)
+- Go Plugin
 
 ### 步骤 2：配置 Jenkins 凭据
 
