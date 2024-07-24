@@ -65,6 +65,8 @@ Active: active (running) since Tue 2023-06-22 16:19:01 +03; 4min 57s ago
 
 这里使用 `brew` 进行安装, 如果没安装可以看这里：https://brew.sh/
 
+#### 安装 Jenkins
+
 ```bash
 # 安装
 brew install jenkins-lts
@@ -84,6 +86,15 @@ brew services start jenkins
 # 重启服务
 brew services restart jenkins
 ```
+
+#### 访问 Jenkins
+
+访问地址：`http://localhost:8080`
+
+查看初始密码：`sudo cat /var/lib/jenkins/secrets/initialAdminPassword`
+
+首次登录以后需要创建第一个管理员账号。
+
 
 ## 安装 Jenkins 插件
 
