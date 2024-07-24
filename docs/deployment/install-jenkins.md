@@ -63,11 +63,27 @@ Active: active (running) since Tue 2023-06-22 16:19:01 +03; 4min 57s ago
 
 ### macOS 上安装
 
-```bash
+这里使用 `brew` 进行安装, 如果没安装可以看这里：https://brew.sh/
 
+```bash
+# 安装
+brew install jenkins-lts
+# 启动服务
+brew services start jenkins-lts
+# 重启服务
+brew services restart jenkins-lts
 ```
 
+这里安装的是 LTS 版本，如果想体验最新版可以看这里；
 
+```bash
+# 安装
+brew install jenkins
+# 启动服务
+brew services start jenkins
+# 重启服务
+brew services restart jenkins
+```
 
 ## 安装 Jenkins 插件
 
