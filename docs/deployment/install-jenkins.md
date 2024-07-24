@@ -95,7 +95,6 @@ brew services restart jenkins
 
 首次登录以后需要创建第一个管理员账号。
 
-
 ## 安装 Jenkins 插件
 
 - Go
