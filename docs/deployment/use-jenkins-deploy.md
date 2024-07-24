@@ -309,5 +309,6 @@ pipeline {
 
 - https://blog.wangriyu.wang/2018/08-Jenkins.html
 - https://desistdaydream.github.io/docs/9.%E8%BF%90%E7%BB%B4/Ansible/Inventory-%E9%85%8D%E7%BD%AE%E6%96%87%E4%BB%B6%E8%AF%A6%E8%A7%A3/
+- https://www.youtube.com/watch?v=Bgv4C0buCsU
 - https://github.com/webmagicinformatica/hello-webapp-golang/blob/master/Jenkinsfile
 
