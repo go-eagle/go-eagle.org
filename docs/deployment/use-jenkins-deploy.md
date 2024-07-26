@@ -120,15 +120,25 @@ ansible-playbook -i /data/deploy/ansible/hosts /data/deploy/ansible/roles/go-pla
 ANSIBLE_DEBUG=True ansible-playbook -i /data/deploy/ansible/hosts /data/deploy/ansible/roles/go-playbook.yaml
 ```
 
-#### 4. 继续添加构建操作
+#### 4. 配置 Ansible
 
-点击 “添加构建操作”，选择 “Ansible Playbook”。
+配置 `ansible.cfg`, 内容如下
 
-在 Ansible Playbook 配置中：
+```yaml
+[defaults]
+# Jenkins 上的 hosts
+# -i 不指定时默认去读这里指定的
+# inventory = /home/deploy/ansible/hosts
+remote_user = root
 
-- Path to Playbook：填写您的 Ansible Playbook 文件路径，例如 /path/to/playbook.yml。
-- Inventory：填写您的 Ansible inventory 文件路径，例如 /path/to/inventory。
-- Credentials：选择之前配置的 SSH 凭据。
+[privilege_escalation]
+become = True
+become_method = sudo
+become_user = root
+
+[inventory:vars]
+ansible_python_interpreter=/usr/bin/python3
+```
 
 #### 5. 编写 Ansible Playbook
 
@@ -137,6 +147,8 @@ ANSIBLE_DEBUG=True ansible-playbook -i /data/deploy/ansible/hosts /data/deploy/a
 ansible 推荐都是以role模板格式作为playbook来实现非常强大的功能, 模板推荐：https://galaxy.ansible.com/
 
 > ansible 官方文档：https://docs.ansible.com/ansible/latest/index.html
+
+`go-playbook.yaml` 内容如下：
 
 ```yaml
 ---
@@ -198,6 +210,8 @@ ansible 推荐都是以role模板格式作为playbook来实现非常强大的功
 Ansible inventory 即 hosts， 配置如下，默认的 Inventory：/etc/ansible/hosts
 
 > Inventory文件格式: 最常见的格式是 INI 和 YAML 格式, 常用的是 INI
+
+`hosts` 配置如下:
 
 ```ini
 [dev]
