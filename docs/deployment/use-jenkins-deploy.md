@@ -11,8 +11,45 @@
 1. Jenkins 已安装并运行。
 2. Jenkins 机器上安装 ansible
 3. 目标机器（要部署的机器）配置了 SSH，并能从 Jenkins 服务器上通过 SSH 访问。
-4. Go 已安装在目标机器上，供编译使用。
+4. Go 已安装在 Jenkins 机器上，供编译使用。
 5. systemd (通常已经安装在大多数 Linux 发行版中)
+
+### 步骤0 ：copy 公钥到目标机器
+
+#### 生成ssh key
+```bash
+ssh-keygen -t rsa -b 4096
+```
+
+生成后一般默认在 `~/.ssh/id_rsa` 和 `~/.ssh/id_rsa.pub`
+
+#### copy 公钥到目标机器
+
+方式一:
+
+找到公钥 `~/.ssh/id_rsa.pub`, 将内容添加到目标机器的文件中: `~/.ssh/authorized_keys`
+
+```bash
+vim ~/.ssh/authorized_keys
+```
+
+方式二:
+
+使用 `ssh-copy-id`, 此方式更快捷。
+
+```bash
+ssh-copy-id user@remote_host
+```
+
+执行该命令后，系统会提示你输入远程服务器的密码，然后自动将本地公钥添加到远程服务器的 authorized_keys 文件中。
+
+然后就可以使用命令测试了
+
+```bash
+ssh user@remote_host
+```
+
+如果正常就可以成功登录目标服务器了。
 
 ### 步骤 1：在 Jenkins 上安装必要的插件
 
@@ -34,17 +71,7 @@
 
 需要确保 Ansible 已安装在 Jenkins 主机上，并且配置了 Ansible 的 inventory 文件来管理目标机器。
 
-`sudo apt install python ansible -y`
-
-同时添加一个 ansible 的专属用户
-
-```bash
-sudo useradd ansible-admin
-sudo passwd ansible-admin
-sudo visudo
-```
-
-将 Add “ansible-admin ALL=(ALL) ALL” to this sudoers file.
+`sudo yum install python3 ansible -y`
 
 ### 步骤 4: 配置 Freestyle 项目
 
@@ -79,14 +106,14 @@ cd $PROJECT_DIR
 make build
 
 # 分发到相应机器上
-ansible-playbook -i /etc/ansible/hosts /etc/ansible/roles/deploy-go-service.yaml \
+ansible-playbook -i /data/deploy/ansible/hosts /data/deploy/ansible/roles/go-playbook.yaml \
 -e 'service_name=user-web-service service_port=8080 env=prod build_work=/data/jenkins_home/workspace/ops-deploy-go-service' -vv
 ```
 
 也可以使用命令直接进行测试，为了方便看出错误信息，可以开启debug模式
 
 ```bash
-ANSIBLE_DEBUG=True ansible-playbook -i /etc/ansible/hosts /etc/ansible/roles/deploy-go-service.yaml
+ANSIBLE_DEBUG=True ansible-playbook -i /data/deploy/ansible/hosts /data/deploy/ansible/roles/go-playbook.yaml
 ```
 
 #### 4. 继续添加构建操作
@@ -108,29 +135,45 @@ ansible 推荐都是以role模板格式作为playbook来实现非常强大的功
 > ansible 官方文档：https://docs.ansible.com/ansible/latest/index.html
 
 ```yaml
-# /etc/ansible/roles/deploy-go-service/deploy-go-service.yml
 ---
 - name: Distribute and run Go binary
   # 要操作的机器组，在文件 /etc/ansible/hosts 进行配置
-  hosts: all
+  hosts: dev
+  become: yes
+  vars:
+    directories:
+      - /data/work/user-service/bin
+      - /data/work/user-service/conf
+
   tasks:
+    - name: Ping test
+      ping:
+
+    - name: Create remote dir
+      become: true
+      file:
+        path: "{{ item }}"
+        state: directory
+        mode: '0755'
+        owner: work
+        group: work
+      with_items: "{{ directories }}"
+
     - name: Copy Go binary to target machines
       copy:
-        src: /path/to/compiled/binary/my_go_project
-        dest: /path/to/destination/my_go_project
+        src: /home/work/user-service/build/user-service
+        dest: /data/work/user-service/bin/
         mode: '0755'
 
-    - name: Copy configuration file to target machines
+    - name: Copy config file to target machines
       copy:
-        src: /path/to/config/config.yaml
-        dest: /path/to/destination/config.yaml
+        src: /home/work/user-service/config/config-test.yaml
+        dest: /data/work/user-service/conf/
         mode: '0644'
 
-    - name: Setup systemd service for the Go application
-      command: systemctl start my_go_service
-
-    - name: Reload systemd and restart Go application service
-      command: systemctl restart my_go_service
+    - name: Restart Go application
+      # systemd 的 user-service.service 需要提前添加好配置
+      command: sudo systemctl restart user-service.service
       
 ```
 
@@ -143,25 +186,22 @@ Ansible inventory 即 hosts， 配置如下，默认的 Inventory：/etc/ansible
 > Inventory文件格式: 最常见的格式是 INI 和 YAML 格式, 常用的是 INI
 
 ```ini
-# /etc/ansible/hosts
-[dev] // 组名
-10.9.X.A ansible_connection=ssh ansible_ssh_user=work
-
-[prod]
-10.42.X.B ansible_connection=ssh ansible_ssh_user=work
-10.42.X.C ansible_connection=ssh ansible_ssh_user=work
-```
-
-或
-
-```ini
-[all]
-server1 ansible_host=192.168.1.1 ansible_user=user
-server2 ansible_host=192.168.1.2 ansible_user=user
+[dev]
+10.10.1.1 ansible_user=root ansible_python_interpreter=/usr/bin/python3
+10.10.1.2 ansible_user=root ansible_python_interpreter=/usr/bin/python3
 
 ```
 
-#### 7. 保存并构建项目
+#### 7. 需要在目标服务器上安装python3
+
+如果是上面
+
+```bash
+sudo yum install python39 -y
+sudo ln -sf /usr/bin/python3.9 /usr/bin/python3
+```
+
+#### 8. 保存并构建项目
 
 点击 “保存” 按钮保存 Jenkins 项目的配置，然后点击 “立即构建” 以启动构建过程。
 
