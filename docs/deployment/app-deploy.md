@@ -34,16 +34,6 @@ make build
 
 可以使用 scp、rsync、ansible 或者 Jenkins 部署到目标服务器。但为了防止进程意外退出，可以使用 `systemd` 或 `Supervisord` 进行进程守护。
 
-### 使用 systemd
-
-1. 创建 systemd 服务单元文件
-
-```bash
-sudo touch /etc/systemd/system/user-service.service
-```
-
-2. 配置服务单元文件
-
 在此之前先需要创建用户和用户组:
 
 ```bash
@@ -60,11 +50,28 @@ id work
 groups work
 ```
 
-还需要把程序执行目录修改下所属用户和组
+创建相应的目录
+
+```bash
+mkdir -p /data/work/user-service/bin
+mkdir -p /data/work/user-service/log
+```
+
+最后还需要把程序执行目录修改下所属用户和组
 
 ```bash
 chown -R work:work /data/work
 ```
+
+### 使用 systemd
+
+1. 创建 systemd 服务单元文件
+
+```bash
+sudo touch /etc/systemd/system/user-service.service
+```
+
+2. 配置服务单元文件
 
 在 `user-service.service` 中添加如下内容:
 
@@ -120,10 +127,9 @@ sudo apt-get install supervisor
 
 ```ini
 [program:user-service]
-user=www
+user=work
 # environment=
-# directory=/home/go/eagle
-command=/data/www/user-service/bin/user-service -p 8080 -c /data/www/user-service/conf/config-test.yaml -l /data/logs/user-service
+command=/data/work/user-service/bin/user-service -p 8080 -c /data/work/user-service/conf/config-test.yaml -l /data/logs/user-service
 autostart=true
 autorestart=true
 stdout_logfile=/data/logs/user-service/supervisor_std.log
