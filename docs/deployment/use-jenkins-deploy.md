@@ -91,6 +91,9 @@ ssh user@remote_host
 添加具体要执行的命令，比如
 
 ```bash
+# 开启调试模式
+set -x
+
 # 设置 Go 环境变量
 export GOPATH=$HOME/go
 export PATH=$PATH:/usr/local/go/bin:$GOPATH/bin
@@ -200,8 +203,10 @@ Ansible inventory 即 hosts， 配置如下，默认的 Inventory：/etc/ansible
 [dev]
 10.10.1.1 ansible_user=root ansible_python_interpreter=/usr/bin/python3
 10.10.1.2 ansible_user=root ansible_python_interpreter=/usr/bin/python3
-
 ```
+
+> 注意：这里的 `ansible_python_interpreter` 指的是目标服务器上的python
+
 
 #### 7. 需要在目标服务器上安装python3
 
