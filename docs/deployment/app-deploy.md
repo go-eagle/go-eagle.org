@@ -27,7 +27,7 @@ make build
 运行
 
 ```bash
-/data/www/user-service/bin/user-service -p 8080 -c /data/www/user-service/conf/config-test.yaml -l /data/logs/user-service
+/data/work/user-service/bin/user-service -p 8080 -c /data/work/user-service/conf/config-test.yaml -l /data/logs/user-service
 ```
 
 ## 二进制文件部署
@@ -44,6 +44,22 @@ sudo touch /etc/systemd/system/user-service.service
 
 2. 配置服务单元文件
 
+在此之前先需要创建用户和用户组:
+
+```bash
+# 创建用户组
+groupadd work
+# 创建用户并添加到用户组
+useradd -g work work
+# 设置用户密码
+passwd work
+
+# 查看用户
+id work
+# 查看用户组
+groups work
+```
+
 添加如下内容:
 
 ```bash
@@ -52,9 +68,9 @@ Description=User service
 After=network.target
 
 [Service]
-User=www
-Group=www
-ExecStart=/data/www/user-service/bin/user-service -p 8080 -c /data/www/user-service/conf/config-test.yaml -l /data/logs/user-service
+User=work
+Group=work
+ExecStart=/data/work/user-service/bin/user-service -p 8080 -c /data/work/user-service/conf/config-test.yaml -l /data/logs/user-service
 Restart=always
 RestartSec=10
 StartLimitBurst=5
