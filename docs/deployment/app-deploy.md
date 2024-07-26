@@ -54,7 +54,7 @@ groups work
 
 ```bash
 mkdir -p /data/work/user-service/bin
-mkdir -p /data/work/user-service/log
+mkdir -p /data/work/user-service/logs
 ```
 
 最后还需要把程序执行目录修改下所属用户和组
@@ -109,7 +109,12 @@ sudo systemctl status user-service.service
 
 # 查看服务日志
 journalctl -u user-service.service
+
+# 查看实时日志
+journalctl -u user-service.service -f
 ```
+
+> 注意：这里使用 user-service.service 和 user-service 都是可以的
 
 ### 使用 Supervisord
 
