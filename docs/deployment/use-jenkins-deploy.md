@@ -187,14 +187,14 @@ ansible 推荐都是以role模板格式作为playbook来实现非常强大的功
         dest: /data/work/user-service/conf/
         mode: '0644'
 
-# systemd 的 user-service.service 可以手动添加好配置或者使用下面的task
-#    - name: Setup systemd service
-#      copy:
-#        src: /home/work/user-service/deploy/systemd/finance-service.service
-#        dest: /etc/systemd/system/finance-web-service.service
-#        mode: '0644'
-#        owner: root
-#        group: root
+    # systemd 的 user-service.service 可以手动添加好配置或者使用下面的task
+    - name: Setup systemd service
+      copy:
+        src: /home/work/user-service/deploy/systemd/user-service.service
+        dest: /etc/systemd/system/user-service.service
+        mode: '0644'
+        owner: root
+        group: root
 
     - name: Reload systemd
       systemd:
