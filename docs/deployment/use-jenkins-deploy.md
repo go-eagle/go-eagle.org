@@ -79,8 +79,14 @@ cd $PROJECT_DIR
 make build
 
 # 分发到相应机器上
-ansible-playbook -i /etc/ansible/hosts /etc/ansible/roles/deploy-go-service/deploy-go-service.yaml \
--e 'service_name=user-web-service service_port=8080 env=prod build_work=/data/jenkins_home/workspace/ops-deploy-go-service' -uroot -vv
+ansible-playbook -i /etc/ansible/hosts /etc/ansible/roles/deploy-go-service.yaml \
+-e 'service_name=user-web-service service_port=8080 env=prod build_work=/data/jenkins_home/workspace/ops-deploy-go-service' -vv
+```
+
+也可以使用命令直接进行测试，为了方便看出错误信息，可以开启debug模式
+
+```bash
+ANSIBLE_DEBUG=True ansible-playbook -i /etc/ansible/hosts /etc/ansible/roles/deploy-go-service.yaml
 ```
 
 #### 4. 继续添加构建操作
