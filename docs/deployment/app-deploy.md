@@ -32,7 +32,7 @@ make build
 
 ## 二进制文件部署
 
-可以使用 scp、rsync 或者 Jenkins 部署到目标服务器。但为了防止进程意外退出，可以使用 `systemd` 或 `Supervisord` 进行进程守护。
+可以使用 scp、rsync、ansible 或者 Jenkins 部署到目标服务器。但为了防止进程意外退出，可以使用 `systemd` 或 `Supervisord` 进行进程守护。
 
 ### 使用 systemd
 
@@ -60,7 +60,13 @@ id work
 groups work
 ```
 
-添加如下内容:
+还需要把程序执行目录修改下所属用户和组
+
+```bash
+chown -R work:work /data/work
+```
+
+在 `user-service.service` 中添加如下内容:
 
 ```bash
 [Unit]
