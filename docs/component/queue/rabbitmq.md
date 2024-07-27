@@ -90,6 +90,8 @@ test-multi:
 
 对于 消息队列我们一般会独立启动一个常驻服务来进行任务的处理，我们会使用类似启动 `http server` 的方式进行启动，具体如下
 
+1. 配置rabbitmq服务
+
 ```go
 # internal/server/server.go
 # 将 NewRabbitmqConsumerServer 注入到 server
@@ -97,9 +99,50 @@ test-multi:
 var ProviderSet = wire.NewSet(NewHTTPServer, NewRabbitmqConsumerServer)
 ```
 
-然后运行即可
+2. 创建 handler
+
+在 `internal/jobs` 目录下，新增文件 `send_email.go`, 内容如下:
+
+```go
+// internal/jobs/send_email.go
+func SendWelcomeEmailHandler(ctx context.Context, body amqp091.Delivery) (action rabbitmq.Action) {
+	msg := make(map[string]interface{})
+	err := json.Unmarshal(body.Body, &msg)
+	if err != nil {
+		logger.Errorf("consumer handler unmarshal msg err: %s", err.Error())
+		return rabbitmq.NackDiscard
+	}
+	logger.Infof("consumer handler receive msg: %s", msg)
+
+	// 下面可以增加自己的业务逻辑处理
+
+	return rabbitmq.Ack
+}
+```
+
+3. 注册 handler
+
+```go
+// internal/server/rabbitmq.go
+func NewRabbitmqConsumerServer() *rabbitmq.Server {
+	rabbitmqConf.Load()
+
+	srv := rabbitmq.NewServer()
+
+	// here register handler
+	srv.RegisterHandler(tasks.TypeEmailWelcome, jobs.SendWelcomeEmailHandler)
+	// here register other handlers...
+
+	return srv
+}
+```
+
+4. 运行服务
 
 ```bash
+cd cmd/consumer
+wire
+cd ../..
 go run cmd/consumer/main.go cmd/consumer/wire_gen.go
 ```
 
