@@ -86,6 +86,25 @@ test-multi:
 
 ## 使用
 
+### 配置 rabbitmq server
+
+对于 消息队列我们一般会独立启动一个常驻服务来进行任务的处理，我们会使用类似启动 `http server` 的方式进行启动，具体如下
+
+```go
+# internal/server/server.go
+# 将 NewRabbitmqConsumerServer 注入到 server
+
+var ProviderSet = wire.NewSet(NewHTTPServer, NewRabbitmqConsumerServer)
+```
+
+然后运行即可
+
+```bash
+go run cmd/consumer/main.go cmd/consumer/wire_gen.go
+```
+
+也可以参看下面进行测试。
+
 ### 生产者
 
 ```go
