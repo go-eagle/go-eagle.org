@@ -48,19 +48,23 @@ slug: /component/queue/redis
 ### 配置
 
 ```yaml
-# config/cron.yaml
-# redis配置
-Addr: 127.0.0.1:6379
-Password: ""
-DB: 0
-MinIdleConn: 200
-DialTimeout: 60s
-ReadTimeout: 500ms
-WriteTimeout: 500ms
-PoolSize: 100
-PoolTimeout: 240s
+# config/consumer.yaml
 
-Concurrency: 10  # 指定worker的数量
+redis:
+  Addr: 127.0.0.1:6379
+  Password: ""
+  DB: 0
+  MinIdleConn: 200
+  DialTimeout: 60s
+  ReadTimeout: 500ms
+  WriteTimeout: 500ms
+  PoolSize: 100
+  PoolTimeout: 240s
+  Concurrency: 10 # 指定worker的数量
+
+rabbitmq:
+  addr: guest:guest@localhost:5672
+  exchangeName: test-exchange
 ```
 
 ### 定义task
@@ -145,48 +149,33 @@ eagle task list
 
 ### 注册task
 
-> 在需要执行task的地方进行注册
+在 `internal/server/redis.go` 进行任务注册
 
 ```go
-// 创建任务
-task, err := NewEmailWelcomeTask(1)
-if err != nil {
-    log.Fatalf("could not create task: %v", err)
-}
-
-// 即时消息
-_, err := GetClient().Enqueue(task)
-
-// 延时消息
-_, err := GetClient().Enqueue(task, asynq.ProcessIn(10*time.Second))
-
-// 定时消息
-_, err := GetClient().Enqueue(task, asynq.ProcessAt(time.Now().Add(time.Hour)))
-
-// 超时、重试
-_, err := GetClient().Enqueue(task, asynq.MaxRetry(10), asynq.Timeout(3*time.Minute))
-
-// 优先级消息
-_, err := GetClient().Enqueue(task, asynq.Queue(QueueCritical))
+// 创建任务并注册
+err := tasks.NewEmailWelcomeTask(tasks.EmailWelcomePayload{UserID: 1})
+	if err != nil {
+		logger.Fatalf("could not create task: %v", err)
+	}
 ```
 
 ### 注册handle
 
-在 main.go 进行注册
+在 `internal/server/redis.go` 进行注册，用于处理任务
 
 ```go
-    ...
-    // mux maps a type to a handler
-    mux := asynq.NewServeMux()
-    // 这里进行注册
-    mux.HandleFunc(tasks.TypeEmailWelcome, tasks.HandleEmailWelcomeTask)
-    ...
+// internal/server/redis.go
+  ...
+  // register handler
+	srv.RegisterHandler(tasks.TypeEmailWelcome, tasks.HandleEmailWelcomeTask)
+	// here register other handlers...
+  ...
 ```
 
 ### 启动server
 
 ```go
-go run cmd/cron/main.go
+go run cmd/consumer/main.go cmd/consumer/wire_gen.go
 ```
 
 OK, 这样task就会按照指定的方式运行了。
@@ -196,7 +185,7 @@ OK, 这样task就会按照指定的方式运行了。
 详细查看具体案例
 
 - [task定义](https://github.com/go-microservice/user-service/tree/main/internal/tasks)
-- [运行server](https://github.com/go-microservice/user-service/blob/main/cmd/cron/main.go)
+- [运行server](https://github.com/go-microservice/user-service/blob/main/cmd/consumer/main.go)
 
 ## Reference
 
