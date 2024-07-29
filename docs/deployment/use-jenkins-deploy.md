@@ -368,6 +368,7 @@ pipeline {
 ```
 
 > pipeline文档：https://www.jenkins.io/doc/book/pipeline/
+> Jenkinsfile语法：https://www.jenkins.io/doc/book/pipeline/syntax/
 
 ### 步骤 4：配置目标机器
 
