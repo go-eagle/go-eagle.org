@@ -251,23 +251,21 @@ sudo ln -sf /usr/bin/python3.9 /usr/bin/python3
 
 > 安装docker: yum install docker-ce docker-ce-cli containerd.io docker-buildx-plugin docker-compose-plugin
 
-### 步骤 1：在 Jenkins 上安装必要的插件
+### 步骤 0：在 Jenkins 上安装必要的插件
 
 安装以下 Jenkins 插件：
 
 - SSH Agent Plugin
-- Pipeline Plugin (用于 Jenkinsfile 支持)
+- Ansible Plugin
 - Go Plugin
 
-### 步骤 2：配置 Jenkins 凭据
+### 步骤1 ：在 Jenkins 上的 新建任务
 
-在 Jenkins 中添加 SSH 凭据（SSH Username with Private Key）：
+- 输入一个任务名，比如: deploy-user-service
+- 选择任务类型：pipeline
+- 点击确定，进入到 General 里进行配置
 
-1. 在 Jenkins 管理页面，选择 “Credentials”。
-2. 选择合适的域，点击 “Add Credentials”。
-3. 选择 “SSH Username with private key”，并填写相关信息（用户名、私钥等）。
-
-### 步骤 3：编写 Jenkinsfile
+### 步骤 2：编写 Jenkinsfile
 
 在 Go 项目的根目录下创建一个 Jenkinsfile，定义 Jenkins Pipeline。以下是一个示例：
 
@@ -370,19 +368,19 @@ pipeline {
 > pipeline文档：https://www.jenkins.io/doc/book/pipeline/
 > Jenkinsfile语法：https://www.jenkins.io/doc/book/pipeline/syntax/
 
-### 步骤 4：配置目标机器
+### 步骤 3：配置 Jenkins 凭据
 
-确保目标机器上具备以下条件：
+1. 在流水线的定义中选择：Pipeline script from SCM
+2. 在 SCM 选择 Git
+3. 填入仓库地址， Repository URL
+4. 选择访问仓库时的凭证 Credentials
+5. 填写要构建的分支，比如选择master, 则填入 "*/master"
+6. 指定脚本路径，主要是指 `Jenkinsfile` 的路径，如果在项目根目录下，直接填入 `Jenkinsfile` 即可。
+7. 保存并构建项目。
 
-1. 安装了 Go 语言环境。
-2. Jenkins 服务器能够通过 SSH 访问目标机器。
-3. 设置好项目目录并给予相应的权限。
+### 步骤 4：构建并运行 Pipeline
 
-### 步骤 5：在 Jenkins 上创建并运行 Pipeline
-
-1. 在 Jenkins 上创建一个新的 Pipeline 项目。
-2. 在项目配置中，将 Pipeline script from SCM 选项设置为 Jenkinsfile。
-3. 保存并构建项目。
+点击 “立即构建” 开始构建项目
 
 ## References
 
