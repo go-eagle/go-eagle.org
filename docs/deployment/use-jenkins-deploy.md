@@ -367,6 +367,8 @@ pipeline {
 }
 ```
 
+> pipeline文档：https://www.jenkins.io/doc/book/pipeline/
+
 ### 步骤 4：配置目标机器
 
 确保目标机器上具备以下条件：
