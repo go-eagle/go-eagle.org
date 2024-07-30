@@ -280,6 +280,7 @@ pipeline {
         GO_PROJECT_DIR = '/path/to/go/project/on/remote'
         REGISTRY = 'registry.cn-hangzhou.aliyuncs.com'
         IMAGE_NAME = 'myapp'
+        NAMESPACE = 'your-docker-namespace'
         KUBECONFIG_CREDENTIALS_ID = 'your-kubeconfig-credentials-id'
     }
 
@@ -315,7 +316,7 @@ pipeline {
             steps {
                 // 在本地构建 Go 项目
                 sh 'make docker'
-                sh "docker build -t ${REGISTRY}/${IMAGE_NAME}:${env.BUILD_NUMBER} ."
+                sh "docker build -t ${REGISTRY}/${NAMESPACE}/${IMAGE_NAME}:${env.BUILD_NUMBER} ."
             }
         }
 
@@ -325,7 +326,7 @@ pipeline {
                    withCredentials([usernamePassword(credentialsId: 'DOCKER_REGISTRY_CREDENTIALS_ID', usernameVariable: 'DOCKER_USERNAME', passwordVariable: 'DOCKER_PASSWORD')]) {
                        sh """
                            echo $DOCKER_PASSWORD | docker login --username $DOCKER_USERNAME --password-stdin
-                           docker push ${REGISTRY}/${IMAGE_NAME}:${env.BUILD_NUMBER}
+                           docker push ${REGISTRY}/${NAMESPACE}/${IMAGE_NAME}:${env.BUILD_NUMBER}
                        """
                    }
                }
