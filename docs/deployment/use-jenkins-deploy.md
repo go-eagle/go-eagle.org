@@ -276,10 +276,11 @@ pipeline {
     }
 
     environment {
-        // 配置目标机器的 SSH 凭据 ID
-        REMOTE_HOST = 'user@your-remote-host'
         CREDENTIALS_ID = 'your-credentials-id'
         GO_PROJECT_DIR = '/path/to/go/project/on/remote'
+        REGISTRY = 'registry.cn-hangzhou.aliyuncs.com'
+        IMAGE_NAME = 'myapp'
+        KUBECONFIG_CREDENTIALS_ID = 'your-kubeconfig-credentials-id'
     }
 
     stages {
@@ -314,6 +315,7 @@ pipeline {
             steps {
                 // 在本地构建 Go 项目
                 sh 'make docker'
+                sh "docker build -t ${REGISTRY}/${IMAGE_NAME}:${env.BUILD_NUMBER} ."
             }
         }
 
@@ -323,32 +325,21 @@ pipeline {
                    withCredentials([usernamePassword(credentialsId: 'DOCKER_REGISTRY_CREDENTIALS_ID', usernameVariable: 'DOCKER_USERNAME', passwordVariable: 'DOCKER_PASSWORD')]) {
                        sh """
                            echo $DOCKER_PASSWORD | docker login --username $DOCKER_USERNAME --password-stdin
-                           docker push eagle/
+                           docker push ${REGISTRY}/${IMAGE_NAME}:${env.BUILD_NUMBER}
                        """
                    }
                }
            }
         }
 
-        stage('Deploy') {
+        stage('Deploy to Kubernetes') {
             steps {
-                // 使用 SSH 将构建的二进制文件传输到远程机器
-                sshagent(credentials: [env.CREDENTIALS_ID]) {
-                    sh """
-                        scp -o StrictHostKeyChecking=no my_go_project ${env.REMOTE_HOST}:${env.GO_PROJECT_DIR}
-                        ssh -o StrictHostKeyChecking=no ${env.REMOTE_HOST} "chmod +x ${env.GO_PROJECT_DIR}/my_go_project"
-                    """
-                }
-            }
-        }
-
-        stage('Run') {
-            steps {
-                // 运行远程机器上的 Go 项目
-                sshagent(credentials: [env.CREDENTIALS_ID]) {
-                    sh """
-                        ssh -o StrictHostKeyChecking=no ${env.REMOTE_HOST} "nohup ${env.GO_PROJECT_DIR}/my_go_project > /dev/null 2>&1 &"
-                    """
+                script {
+                    // Ensure kubectl is configured with the proper KUBECONFIG
+                    withCredentials([file(credentialsId: KUBECONFIG_CREDENTIALS_ID, variable: 'KUBECONFIG')]) {
+                        sh 'kubectl apply -f k8s/go-deployment.yaml'
+                        sh "kubectl set image deployment/myapp myapp=${REGISTRY}/${IMAGE_NAME}:${env.BUILD_NUMBER}"
+                    }
                 }
             }
         }
