@@ -247,6 +247,7 @@ sudo ln -sf /usr/bin/python3.9 /usr/bin/python3
 2. 在 Jenkins 机器上 安装 Go
 3. 在 Jenkins 机器上安装 Git: `yum install git -y`
 4. Jenkins 上安装 docker, 以便可以打镜像
+5. Jenkins 上安装 kubectl
 
 > 安装docker: yum install docker-ce docker-ce-cli containerd.io docker-buildx-plugin docker-compose-plugin
 
@@ -326,7 +327,7 @@ pipeline {
                script {
                    withCredentials([usernamePassword(credentialsId: 'DOCKER_REGISTRY_CREDENTIALS_ID', usernameVariable: 'DOCKER_USERNAME', passwordVariable: 'DOCKER_PASSWORD')]) {
                        sh """
-                           echo $DOCKER_PASSWORD | docker login --username $DOCKER_USERNAME --password-stdin
+                           echo $DOCKER_PASSWORD | docker login --username $DOCKER_USERNAME --password-stdin ${REGISTRY}
                            docker push ${REGISTRY}/${NAMESPACE}/${IMAGE_NAME}:${env.BUILD_NUMBER}
                        """
                    }
@@ -339,8 +340,12 @@ pipeline {
                 script {
                     // Ensure kubectl is configured with the proper KUBECONFIG
                     withCredentials([file(credentialsId: KUBECONFIG_CREDENTIALS_ID, variable: 'KUBECONFIG')]) {
-                        sh 'kubectl apply -f k8s/go-deployment.yaml'
+                        sh 'kubectl apply -f deploy/k8s/go-deployment.yaml'
                         sh "kubectl set image deployment/myapp myapp=${REGISTRY}/${IMAGE_NAME}:${env.BUILD_NUMBER}"
+                        // or
+                        sh "sed -i 's/<IMG_NAME>/${img_name}:${build_tag}/' deploy/k8s/go-deployment.yaml"
+                        sh "sed -i 's/<BRANCH_NAME>/${env.BRANCH_NAME}/' deploy/k8s/go-deployment.yaml"
+                        sh "/data/opt/kubernetes/client/bin/kubectl apply -f ${WORKSPACE}/deploy/k8s/go-deployment.yaml --record"
                     }
                 }
             }
@@ -374,6 +379,7 @@ pipeline {
 
 - 选择适当的凭证存储域（通常是全局域）。
 - 点击 "Add Credentials"（添加凭证）。
+- 添加密码或者 private key 的都可以
   
 4. 添加 Docker Registry 凭证:
 
@@ -405,17 +411,19 @@ pipeline {
 
 ### 步骤 5：创建流水线
 
+0. 在 General 中选择 Git Parameter(参数化构建过程) 的名称中填入 `build_tag`, 参数类型为: 标签
 1. 在流水线的定义中选择：Pipeline script from SCM
 2. 在 SCM 选择 Git
 3. 填入仓库地址， Repository URL
 4. 选择访问仓库时的凭证 Credentials
-5. 填写要构建的分支，比如选择master, 则填入 "*/master"
+5. 填写要构建的分支或tag，比如选择master分支, 则填入 "*/master"，如果是tag,则填入 "${build_tag}"
 6. 指定脚本路径，主要是指 `Jenkinsfile` 的路径，如果在项目根目录下，直接填入 `Jenkinsfile` 即可。
 7. 保存并构建项目。
 
 ### 步骤 5：构建并运行 Pipeline
 
-点击 “立即构建” 开始构建项目
+- 如果是分支构建：点击 “立即构建” 开始构建项目
+- 如果是tag构建，点击 “Build with Parameters”， 然后选择对应的构建tag 开始构建。
 
 ## References
 
