@@ -357,7 +357,51 @@ pipeline {
 > pipeline文档：https://www.jenkins.io/doc/book/pipeline/
 > Jenkinsfile语法：https://www.jenkins.io/doc/book/pipeline/syntax/
 
-### 步骤 3：配置 Jenkins 凭据
+### 步骤 3：配置 Jenkins 凭证
+
+1. 进入 Jenkins 管理界面:
+
+打开你的 Jenkins 服务器的管理界面。
+
+2. 管理 Jenkins 凭证:
+   
+- 选择 "Manage Jenkins"（管理 Jenkins）。
+- 选择 "Manage Credentials"（管理凭证）。
+
+3. 添加新的凭证:
+
+- 选择适当的凭证存储域（通常是全局域）。
+- 点击 "Add Credentials"（添加凭证）。
+  
+4. 添加 Docker Registry 凭证:
+
+- Kind（类型）：选择 "Username with password"。
+- Scope（范围）：选择 "Global"（全局）。
+- Username（用户名）：输入你的 Docker Registry 用户名。
+- Password（密码）：输入你的 Docker Registry 密码。
+- ID：输入 DOCKER_REGISTRY_CREDENTIALS_ID，这是你在 pipeline 中引用的凭证 ID。
+- Description（描述）：输入描述信息，例如 "Docker Registry Credentials"。
+- 点击 "OK" 以保存凭证。
+
+### 步骤 4：配置 Kubernetes 凭证
+
+如果你需要在 Jenkins 中使用 Kubernetes 凭证，可以按照以下步骤操作：
+
+1. 获取 Kubeconfig 文件:
+
+从你的 Kubernetes 集群中获取 Kubeconfig 文件，这个文件通常位于 ~/.kube/config。
+
+2. 在 Jenkins 中配置 Kubeconfig 凭证:
+
+- 按照上述步骤进入 Jenkins 的 "Manage Credentials" 界面。
+- 添加新的凭证，选择 "Secret file"（秘密文件）。
+- Scope（范围）：选择 "Global"（全局）。
+- File（文件）：上传你的 Kubeconfig 文件。
+- ID：输入 KUBECONFIG_CREDENTIALS_ID，这是你在 pipeline 中引用的凭证 ID。
+- Description（描述）：输入描述信息，例如 "Kubeconfig for Kubernetes Cluster"。
+- 点击 "OK" 以保存凭证。
+
+### 步骤 5：创建流水线
 
 1. 在流水线的定义中选择：Pipeline script from SCM
 2. 在 SCM 选择 Git
@@ -367,7 +411,7 @@ pipeline {
 6. 指定脚本路径，主要是指 `Jenkinsfile` 的路径，如果在项目根目录下，直接填入 `Jenkinsfile` 即可。
 7. 保存并构建项目。
 
-### 步骤 4：构建并运行 Pipeline
+### 步骤 5：构建并运行 Pipeline
 
 点击 “立即构建” 开始构建项目
 
