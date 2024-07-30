@@ -254,6 +254,8 @@ sudo ln -sf /usr/bin/python3.9 /usr/bin/python3
 
 安装以下 Jenkins 插件：
 
+- Git Parameter Plugin（用于选择 Git 标签）
+- Pipeline: GitHub Plugin（用于从 GitHub 拉取标签）
 - Git Plugin
 - Go Plugin
 
@@ -277,7 +279,6 @@ pipeline {
 
     environment {
         CREDENTIALS_ID = 'your-credentials-id'
-        GO_PROJECT_DIR = '/path/to/go/project/on/remote'
         REGISTRY = 'registry.cn-hangzhou.aliyuncs.com'
         IMAGE_NAME = 'myapp'
         NAMESPACE = 'your-docker-namespace'
