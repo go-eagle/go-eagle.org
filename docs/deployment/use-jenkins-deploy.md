@@ -243,11 +243,10 @@ sudo ln -sf /usr/bin/python3.9 /usr/bin/python3
 
 ### 前提条件
 
-1. Jenkins 已安装并运行。
-2. 目标机器（要部署的机器）配置了 SSH，并能从 Jenkins 服务器上通过 SSH 访问。
-3. Go 已安装在目标机器上。
-4. 安装 Git: `yum install git -y`
-5. Jenkins-master 上安装 docker
+1. 找一台机器安装好 Jenkins
+2. 在 Jenkins 机器上 安装 Go
+3. 在 Jenkins 机器上安装 Git: `yum install git -y`
+4. Jenkins 上安装 docker, 以便可以打镜像
 
 > 安装docker: yum install docker-ce docker-ce-cli containerd.io docker-buildx-plugin docker-compose-plugin
 
@@ -255,8 +254,7 @@ sudo ln -sf /usr/bin/python3.9 /usr/bin/python3
 
 安装以下 Jenkins 插件：
 
-- SSH Agent Plugin
-- Ansible Plugin
+- Git Plugin
 - Go Plugin
 
 ### 步骤1 ：在 Jenkins 上的 新建任务
