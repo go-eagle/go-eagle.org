@@ -279,18 +279,29 @@ pipeline {
     }
 
     environment {
-        CREDENTIALS_ID = 'your-credentials-id'
         REGISTRY = 'registry.cn-hangzhou.aliyuncs.com'
         IMAGE_NAME = 'myapp'
         NAMESPACE = 'your-docker-namespace'
-        KUBECONFIG_CREDENTIALS_ID = 'your-kubeconfig-credentials-id'
+    }
+
+    // 预留可忽略
+    parameters {
+        string(name: 'branch', defaultValue: 'master', description: '请输入将要构建的代码分支')
+        choice(name: 'mode', choices: ['deploy','rollback'], description: '请选择发布或者回滚？')
+        choice(name: 'remote_ip', choices: ['all','10.10.9.9','10.10.9.10'], description: '选择要发布的主机')
     }
 
     stages {
         stage('Checkout') {
             steps {
                 // 检出代码
-                checkout scm
+                checkout scm:([
+                    $class: 'GitSCM',
+                    branches: [[name: "${GIT_TAG}"]],
+                    userRemoteConfigs: [[
+                        url: "${GIT_URL}"
+                    ]]
+                ])
             }
         }
 
@@ -317,8 +328,9 @@ pipeline {
         stage('Build Docker Image') {
             steps {
                 // 在本地构建 Go 项目
+                def tag = "${GIT_TAG}"
                 sh 'make docker'
-                sh "docker build -t ${REGISTRY}/${NAMESPACE}/${IMAGE_NAME}:${env.BUILD_NUMBER} ."
+                sh "docker build -t ${REGISTRY}/${NAMESPACE}/${IMAGE_NAME}:${tag} ."
             }
         }
 
@@ -326,9 +338,10 @@ pipeline {
            steps {
                script {
                    withCredentials([usernamePassword(credentialsId: 'DOCKER_REGISTRY_CREDENTIALS_ID', usernameVariable: 'DOCKER_USERNAME', passwordVariable: 'DOCKER_PASSWORD')]) {
+                       def tag = "${GIT_TAG}"
                        sh """
                            echo $DOCKER_PASSWORD | docker login --username $DOCKER_USERNAME --password-stdin ${REGISTRY}
-                           docker push ${REGISTRY}/${NAMESPACE}/${IMAGE_NAME}:${env.BUILD_NUMBER}
+                           docker push ${REGISTRY}/${NAMESPACE}/${IMAGE_NAME}:${tag}
                        """
                    }
                }
@@ -339,7 +352,7 @@ pipeline {
             steps {
                 script {
                     // Ensure kubectl is configured with the proper KUBECONFIG
-                    withCredentials([file(credentialsId: KUBECONFIG_CREDENTIALS_ID, variable: 'KUBECONFIG')]) {
+                    withCredentials([file(credentialsId: 'KUBECONFIG_CREDENTIALS_ID', variable: 'KUBECONFIG')]) {
                         sh 'kubectl apply -f deploy/k8s/go-deployment.yaml'
                         sh "kubectl set image deployment/myapp myapp=${REGISTRY}/${IMAGE_NAME}:${env.BUILD_NUMBER}"
                         // or
