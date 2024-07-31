@@ -289,6 +289,7 @@ pipeline {
         string(name: 'branch', defaultValue: 'master', description: '请输入将要构建的代码分支')
         choice(name: 'mode', choices: ['deploy','rollback'], description: '请选择发布或者回滚？')
         choice(name: 'remote_ip', choices: ['all','10.10.9.9','10.10.9.10'], description: '选择要发布的主机')
+        choice(name: 'GIT_TAG', choices: getGitTags(), description: 'Select the Git tag to deploy')
     }
 
     stages {
@@ -371,6 +372,21 @@ pipeline {
             cleanWs()
         }
     }
+}
+
+// Function to get Git tags
+def getGitTags() {
+    def gitTags = []
+    def gitUrl = 'your-project-git'
+
+    withCredentials([usernamePassword(credentialsId: 'GIT_CREDENTIALS_ID', usernameVariable: 'GIT_USERNAME', passwordVariable: 'GIT_PASSWORD')]) {
+        def tags = sh(
+            script: "git ls-remote --tags ${gitUrl} | awk '{print \$2}' | grep -o 'refs/tags/.*' | sed 's/refs\\/tags\\///g' | grep -v '^{}' | tail -n 20",
+            returnStdout: true
+        ).trim().split('\n')
+        gitTags.addAll(tags)
+    }
+    return gitTags
 }
 ```
 
