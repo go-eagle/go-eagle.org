@@ -405,8 +405,9 @@ def getGitTags() {
 }
 ```
 
-> pipeline文档：https://www.jenkins.io/doc/book/pipeline/
-> Jenkinsfile语法：https://www.jenkins.io/doc/book/pipeline/syntax/
+> pipeline文档：https://www.jenkins.io/doc/book/pipeline/  
+> Jenkinsfile语法：https://www.jenkins.io/doc/book/pipeline/syntax/  
+> https://wiki.eryajf.net/pages/2415.html#_1-%E7%B3%BB%E5%88%97%E6%96%87%E7%AB%A0%E3%80%82
 
 ### 步骤 3：配置 Jenkins 凭证
 
