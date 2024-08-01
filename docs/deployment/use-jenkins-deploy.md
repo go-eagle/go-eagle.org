@@ -285,12 +285,12 @@ pipeline {
     }
 
     // 预留可忽略
-    parameters {
-        string(name: 'branch', defaultValue: 'master', description: '请输入将要构建的代码分支')
-        choice(name: 'mode', choices: ['deploy','rollback'], description: '请选择发布或者回滚？')
-        choice(name: 'remote_ip', choices: ['all','10.10.9.9','10.10.9.10'], description: '选择要发布的主机')
-        choice(name: 'GIT_TAG', choices: getGitTags(), description: 'Select the Git tag to deploy')
-    }
+    //parameters {
+    //    string(name: 'branch', defaultValue: 'master', description: '请输入将要构建的代码分支')
+    //    choice(name: 'mode', choices: ['deploy','rollback'], description: '请选择发布或者回滚？')
+    //    choice(name: 'remote_ip', choices: ['all','10.10.9.9','10.10.9.10'], description: '选择要发布的主机')
+    //    choice(name: 'GIT_TAG', choices: getGitTags(), description: 'Select the Git tag to deploy')
+    //}
 
     stages {
         stage('Checkout') {
