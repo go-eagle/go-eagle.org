@@ -279,18 +279,33 @@ pipeline {
     }
 
     environment {
+        GIT_URL="your-project-repo-git"
         REGISTRY = 'registry.cn-hangzhou.aliyuncs.com'
         IMAGE_NAME = 'myapp'
         NAMESPACE = 'your-docker-namespace'
     }
 
     // 预留可忽略
-    //parameters {
+    parameters {
     //    string(name: 'branch', defaultValue: 'master', description: '请输入将要构建的代码分支')
     //    choice(name: 'mode', choices: ['deploy','rollback'], description: '请选择发布或者回滚？')
     //    choice(name: 'remote_ip', choices: ['all','10.10.9.9','10.10.9.10'], description: '选择要发布的主机')
     //    choice(name: 'GIT_TAG', choices: getGitTags(), description: 'Select the Git tag to deploy')
-    //}
+          gitParameter (
+              branch:'',
+              branchFilter: '.*',
+              defaultValue: '',
+              description: '选择将要构建的tag',
+              name: 'GIT_TAG',
+              quickFilterEnabled: true,
+              selectedValue: 'TOP',
+              sortMode: 'DESCENDING_SMART',
+              tagFilter: '*',
+              type: 'PT_TAG',
+              useRepository: env.GIT_URL,
+              listSize: 15
+        )
+    }
 
     stages {
         stage('Checkout') {
@@ -377,7 +392,7 @@ pipeline {
 // Function to get Git tags
 def getGitTags() {
     def gitTags = []
-    def gitUrl = 'your-project-git'
+    def gitUrl = 'your-project-repo-git'
 
     withCredentials([usernamePassword(credentialsId: 'GIT_CREDENTIALS_ID', usernameVariable: 'GIT_USERNAME', passwordVariable: 'GIT_PASSWORD')]) {
         def tags = sh(
@@ -440,12 +455,12 @@ def getGitTags() {
 
 ### 步骤 5：创建流水线
 
-0. 在 General 中选择 Git Parameter(参数化构建过程) 的名称中填入 `build_tag`, 参数类型为: 标签
+0. 在 General 中选择 Git Parameter(参数化构建过程) 的名称中填入 `GIT_TAG`, 参数类型为: 标签，或者在在 Jenkinsfile 配置 gitParameter.GIT_TAG，二选一即可
 1. 在流水线的定义中选择：Pipeline script from SCM
 2. 在 SCM 选择 Git
 3. 填入仓库地址， Repository URL
 4. 选择访问仓库时的凭证 Credentials
-5. 填写要构建的分支或tag，比如选择master分支, 则填入 "*/master"，如果是tag,则填入 "${build_tag}"
+5. 填写要构建的分支或tag，比如选择master分支, 则填入 "*/master"，如果是tag,则填入 "${GIT_TAG}"
 6. 指定脚本路径，主要是指 `Jenkinsfile` 的路径，如果在项目根目录下，直接填入 `Jenkinsfile` 即可。
 7. 一定要把 “轻量级检出” 的勾选去掉，否则会报类似错误： `fatal: couldn't find remote ref refs/heads/v1.xx`
 8. 保存并构建项目。
