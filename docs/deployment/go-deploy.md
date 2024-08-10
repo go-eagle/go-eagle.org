@@ -129,7 +129,7 @@ EOF
 $ PB_REL="https://github.com/protocolbuffers/protobuf/releases"
 # 如果是macOS 可以改为 osx
 $ OS="linux"
-$ VERSION="3.19.4"
+$ VERSION="3.18.1"
 $ curl -LO $PB_REL/download/v$VERSION/protoc-$VERSION-$OS-x86_64.zip
 
 $ unzip protoc-$VERSION-$OS-x86_64.zip -d /usr/local
@@ -141,19 +141,42 @@ $ export PATH="$PATH:/usr/local/bin"
 
 ```bash
 protoc --version
-libprotoc 3.15.6
+libprotoc 3.18.1
 ```
 
 ### 安装 protoc-gen-go 插件
 
+该插件的主要作用是生成 `*.pb.go` 代码，包含消息序列化代码，对应的是参数 `--go_out=xx`
+
 运行：
 
 ```shell script
-go get -u github.com/golang/protobuf/{helloworld,protoc-gen-go}
+# 安装
+go install google.golang.org/protobuf/cmd/protoc-gen-go@v1.27.1
+
+# 更新到指定版本
+go get -u google.golang.org/protobuf/cmd/protoc-gen-go@vX.X.X
 ```
 
 编译后会安装 `protoc-gen-go` 到 `$GOBIN` 目录, 默认在 `$GOPATH/bin`.  
 该目录必须在系统的环境变量 `$PATH中`，这样在编译 `.proto` 文件时 `protocol` 编译器才能找到插件。
+
+### 安装 protoc-gen-go-grpc 插件
+
+该插件的主要作用是生成 `*._grpc.pb.go` 代码， 主要生成 `gRPC` 代码，对应的是参数 `--go-grpc_out=xx`
+
+安装
+
+```shell script
+# 安装
+go install google.golang.org/grpc/cmd/protoc-gen-go-grpc@v1.1.0
+
+# 更新到指定版本
+go get -u google.golang.org/grpc/cmd/protoc-gen-go-grpc@vX.X.X
+```
+
+> 这种参数方式 `--go_out=plugins=grpc` 是比较老的方式，新的都是按上面的方式使用的  
+> 参考：[Differences between protoc-gen-go and protoc-gen-go-grpc](https://stackoverflow.com/questions/64828054/differences-between-protoc-gen-go-and-protoc-gen-go-grpc)
 
 ### 编译安装 protoc
 
@@ -180,6 +203,21 @@ libprotoc 3.15.6
 $ go get -u github.com/golang/protobuf/protoc-gen-go
 
 ```
+
+📢 注意事项
+
+`protoc` 和 `protoc-gen-xxx` 插件 和 `grpc` 和 `protobuf` 在选择哪个版本组合使用时，有没有推荐组合的版本号？
+
+这里推荐：
+
+protoc v3.18.1  
+protoc-gen-go v1.27.1  
+protoc-gen-go-grpc v1.1.0  
+grpc v1.43.0  
+protobuf v1.33.0 
+
+如果有新组合，欢迎告知，感谢~
+
 
 ## Go 开发 IDE 安装和配置
 
