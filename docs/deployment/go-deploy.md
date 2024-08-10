@@ -169,7 +169,7 @@ go get -u google.golang.org/protobuf/cmd/protoc-gen-go@vX.X.X
 
 ```shell script
 # 安装
-go install google.golang.org/grpc/cmd/protoc-gen-go-grpc@v1.1.0
+go install google.golang.org/grpc/cmd/protoc-gen-go-grpc@v1.2.0
 
 # 更新到指定版本
 go get -u google.golang.org/grpc/cmd/protoc-gen-go-grpc@vX.X.X
