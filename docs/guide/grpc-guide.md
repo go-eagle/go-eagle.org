@@ -442,3 +442,5 @@ message ListPostRequest {
 - https://stackoverflow.com/questions/52969205/how-to-assert-grpc-error-codes-client-side-in-go
 - https://google.aip.dev/ 👍🏻
 - https://groups.google.com/g/gogoprotobuf/c/xmFnqAS6MIc (gogo tag说明)
+- google.golang.org/protobuf/encoding/protojson (proto to json, eg: protojson.Unmarshal(bytes, req))
+- github.com/golang/protobuf/jsonpb (json to protobuf eg: sonpb.Unmarshal(r.Body, &req))
