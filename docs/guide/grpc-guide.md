@@ -412,12 +412,12 @@ A: 可以使用 `gogoproto.moretags`，示例如下：
 ```proto
 import "gogo/protobuf/gogo.proto";
 
-// 接收uri中的参数
+// 接收 uri 中的参数
 message GetPostRequest {
 	string id = 1 [(gogoproto.moretags) = 'uri:"id"'];
 }
 
-// 接收form里的参数
+// 接收 query 里的参数
 message ListPostRequest {
 	int64 last_id = 1 [(gogoproto.moretags) = 'form:"last_id"'];
 	int32 limit = 2 [(gogoproto.moretags) = 'form:"limit"'];
@@ -427,7 +427,7 @@ message ListPostRequest {
 
 > https://developers.google.com/protocol-buffers/docs/reference/go/faq
 
-## Reference
+## References
 
 - https://grpc.io/docs/languages/go/quickstart/
 - https://developers.google.com/protocol-buffers/docs/proto3
@@ -441,3 +441,4 @@ message ListPostRequest {
 - https://eddycjy.com/posts/where-is-proto/
 - https://stackoverflow.com/questions/52969205/how-to-assert-grpc-error-codes-client-side-in-go
 - https://google.aip.dev/ 👍🏻
+- https://groups.google.com/g/gogoprotobuf/c/xmFnqAS6MIc (gogo tag说明)
