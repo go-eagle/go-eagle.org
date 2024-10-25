@@ -360,3 +360,57 @@ func main() {
 // fatal error: all goroutines are asleep - deadlock!
 ```
 
+### 切片 slice
+
+#### slice 初始化
+
+- slice 初始化使用 `make([]T, 0, cap)`，不能写成 `make([]T, cap)`，否则后续再使用append操作会导致最终得到了2* cap 长度的数组，并且前半段元素均为零值。
+- `make([]T, 0, cap)` 初始化 slice，需要保证 cap 值不能太大，否则会导致 `panic: runtime error: makeslice: cap out of range`
+
+```go
+// bad case
+s := make([]int64, 10)
+s = append(s, 1)
+s = append(s, 2)
+...
+```
+
+#### slice append
+
+- append 结果需要 **赋值给原切片**，因为对 slice 的 append 操作 **总是** 返回一个「新的 slice 」
+
+提示:
+- 不在多个函数逻辑里修改slice，尽量只读
+- 如果有修改，即使是原地修改也要返回新slice的值
+- 如果实在有多个地方修改，尽量把逻辑隔离开，封装一个struct或者深拷贝出新的slice
+
+```go
+// good case 1
+func main() {
+     sliceMap := map[int][]int{
+         1: {1, 2, 3},
+     }
+     // 不会影响 map 元素
+     // 在 for range 迭代中，遍历的值是元素的值拷贝，更新拷贝并不会更新原始的元素
+     for _, v := range sliceMap {
+         v = append(v, -1)
+     }
+     fmt.Println(sliceMap)  //map[1:[1 2 3]]
+}
+
+// good case 2
+func main() {
+     sliceMap := map[int][]int{
+         1: {1, 2, 3},
+     }
+     // 影响 map 元素
+     for i, v := range sliceMap {
+         sliceMap[i] = append(v, -2)
+     }
+     fmt.Println(sliceMap) //map[1:[1 2 3 -2]]
+}
+```
+
+#### slice 的追加与扩容
+
+#### slice 为空判断
