@@ -444,3 +444,5 @@ message ListPostRequest {
 - https://groups.google.com/g/gogoprotobuf/c/xmFnqAS6MIc (gogo tag说明)
 - google.golang.org/protobuf/encoding/protojson (proto to json, eg: protojson.Unmarshal(bytes, req))
 - github.com/golang/protobuf/jsonpb (json to protobuf eg: sonpb.Unmarshal(r.Body, &req))
+- https://github.com/stormcat24/protodep 管理 proto依赖
+- https://kostyay.com/grpc-5-years-later-is-it-still-worth-it-b181a3b2b73b
