@@ -420,3 +420,4 @@ rabbitmq-plugins enable rabbitmq_web_mqtt
 
 - https://mp.weixin.qq.com/s/TN0HSUdy2UFaGhO5fCYutA
 - https://mp.weixin.qq.com/s/_mFXvbwC0T05So8S_smA9A
+- https://github.com/ThreeDotsLabs/watermill 使用 Go 轻松构建事件驱动的应用程序
