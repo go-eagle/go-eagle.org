@@ -413,4 +413,354 @@ func main() {
 
 #### slice 的追加与扩容
 
+使用 append 操作时，可能是对 slice 进行追加或者扩容，详见[源码](https://github.com/golang/go/blob/fa6aa872225f8d33a90d936e7a81b64d2cea68e1/src/runtime/slice.go#L144)  
+1. 如果「期望容量大于当前容量的两倍」就会使用期望容量；
+2. 如果「当前 slice 的长度小于 1024」 就会将容量翻倍；
+3. 如果「当前 slice 的长度大于 1024 」就会每次增加 25% 的容量，直到新容量大于期望容量；
+
+这主要涉及到我们引用一个 slice 时，对新 slice 的改动可能会影响原有 slice
+1. 如果没有发生扩容，会直接修改原有 slice 对应的内存，会影响原有 slice
+2. 如果发生了扩容，修改会在新的内存中，不会影响原有 slice
+
+```go
+originSlice := []int{0, 1, 2}
+
+// 两个 slice 都引用了 originSlice
+testSlice1 := originSlice[:2]
+testSlice2 := originSlice[:3]
+
+fmt.Println("原始的 slice", originSlice) // 输出 [0,1,2]
+fmt.Println("cap", cap(originSlice))  // 输出 3
+
+fmt.Println("testSlice1 slice", testSlice1)     // 输出 [0,1]
+fmt.Println("testSlice1 len", len(testSlice1))  // 输出 2
+_ = append(testSlice1, 10) // len(testSlice1)<3, append 没发生扩容，append 后会影响 originSlice
+fmt.Println("append 没发生扩容", originSlice) // 输出 [0,1,10]
+
+fmt.Println("testSlice2 slice", testSlice2)     // 输出 [0,1,10]
+fmt.Println("testSlice2 len", len(testSlice2)) // 输出 3
+_ = append(testSlice2, 20) // len(testSlice2)=3, append 发生扩容，append 后不会影响 originSlice
+fmt.Println("append 发生了扩容 originSlice", originSlice) // 输出 [0,1,10]
+```
+
 #### slice 为空判断
+
+- 使用 len 是否为 0 判断一个 slice 或者 map 是否为空，而不是判断是否为 nil
+  - 如果只声明，不赋值，slice 是 nil；例如 var arr []int，json marshal 后是 null
+  - 如果声明+赋值，slice 为空，但是不为nil；例如 arr := make([]int, 0, 0)，json marshal 后是 []
+
+```go
+ // 只声明
+ var slice1 []int
+ fmt.Println(slice1 == nil) // 输出 true
+ fmt.Println(len(slice1))   // 输出 0
+
+ // 声明+赋值
+ slice2 := []int{}
+ fmt.Println(slice2 == nil) // 输出 false
+ fmt.Println(len(slice2))   // 输出 0
+```
+
+### map
+
+#### map遍历key顺序不固定
+
+- `for range map` 遍历key顺序不固定的，Go在开始处理循环逻辑的时候，就做了随机播种，用于决定从哪里开始循环迭代
+- 业务不要依赖range遍历返回的key次序，确实有需要可以通过引入 `slice+sort` 来保证key顺序
+
+> 参看：https://cloud.tencent.com/developer/article/1422355
+
+```go
+// good case
+func main() {
+    m := make(map[string]string)
+    m["hello"] = "echo hello"
+    m["world"] = "echo world"
+    m["go"] = "echo go"
+    m["is"] = "echo is"
+    m["cool"] = "echo cool"
+
+    // 引入slice
+    sortedKeys := make([]string, 0)
+    for k, _ := range m {
+        sortedKeys = append(sortedKeys, k)
+    }
+    // sort 'string' key in increasing order
+    sort.Strings(sorted_keys)
+    for _, k := range sorted_keys {
+        fmt.Printf("k=%v, v=%v\n", k, m[k])
+    }                
+}
+
+// bad case
+func main() {
+     m := make(map[string]string)
+     m["hello"] = "echo hello"
+     m["world"] = "echo world"
+     m["go"] = "echo go"
+     m["is"] = "echo is"
+     m["cool"] = "echo cool"
+
+     for k, v := range m {
+         fmt.Printf("k=%v, v=%v\n", k, v)
+     }
+}
+```
+
+#### map零值
+
+- 对map取值时，「取到空值」和「没取到值」都会返回零值，如果不需要区分这两种情况，只需判断是否为零值即可，需要区分的时候再带上第二个ok
+
+```go
+// case 1
+func main() {
+     // mp非nil
+     mp := make(map[string]int, 1)
+     v, ok := mp["one"]      
+     fmt.Println(v, ok)      //v为0，ok为false
+     v = mp["one"]           
+     fmt.Println(v)          //v为0
+}
+
+// case 2
+func main() {
+     // mp为nil
+     var mp map[string]int
+     v, ok := mp["one"]      
+     fmt.Println(v, ok)      //v为0，ok为false
+     v = mp["one"]           
+     fmt.Println(v)          //v为0
+}
+```
+
+#### map未分配内存
+
+- Map变量如果只声明没有初始化分配内存，直接“赋值”会引发panic，`panic: assignment to entry in nil map`
+
+```go
+// good case
+func main() {
+     // 方式1: 定义
+     mp := make(map[string]string)
+     // 方式2: 声明 + 初始化
+     var mp map[string]string
+     mp = make(map[string]string)
+     // write
+     mp["a"] = "b"
+}
+
+// bad case
+func main() {
+     var mp map[string]string
+     //panic
+     mp["a"] = "b"
+}
+```
+
+#### map删除key不会缩容
+
+- map添加key会自动扩容，删除key不会自动缩容。**也就是在删除元素时，并不会释放内存，使得分配的总内存不断增加，很可能会导致 OOM。**
+[runtime: shrink map as elements are deleted · Issue #20135 · golang/go](https://github.com/golang/go/issues/20135)
+- 目前并没有特别好的解决方式，**可以通过创建一个新的 map 并从旧的 map 中复制元素 来解决。**
+
+```go
+newMap := make(map[int]int, len(oldMap))   //创建一个新的 map
+for k, v := range oldMap {
+    newMap[k] = v
+}
+oldMap = newMap  //map替换
+```
+
+### interface
+
+#### 断言失败会panic
+
+- Interface 类型断言，没有判断是否成功，如果断言失败会 panic
+- 即使业务不关心断言是否成功，也建议使用 `_` 来忽略断言结果，保证不会 panic
+
+```go
+// good case
+func main() {
+     mp := make(map[string]interface{})
+     mp["a"] = "1"
+     mp["b"] = "b"
+     v, _ := mp["a"].(int)
+     if v == 1 {
+        fmt.Println(true)
+     }
+}
+
+// bad case
+func main() {
+     mp := make(map[string]interface{})
+     mp["a"] = "1"
+     mp["b"] = "b"
+     if mp["a"].(int) == 1 {
+        fmt.Println(true)
+     }
+}
+// panic: interface conversion: interface {} is string, not int
+```
+
+### defer
+
+#### defer 参数传递
+
+- 如果希望后续对变量的修改可以在 defer 中生效，让 defer 引用这个外部变量，而不是作为参数传入。特别的，如果传入的参数是**指针**、 **slice**、**map**，对这些变量的修改会影响原有变量
+- defer 推荐的用法是 defer + 匿名函数 + 变量引用 
+
+在 defer 中使用匿名函数
+
+```go
+// good case 1
+num := 0
+
+// num 的修改会被 defer 感知
+// 输出：num = 1
+defer func() {
+    fmt.Println("num =", num)
+}()
+
+num = 1
+```
+
+非指针变量，被外部引用
+
+```go
+// good case 2
+num := 0
+
+// num 的修改会被 defer 感知
+// 输出：num = 1
+defer func() {
+    fmt.Println("num =", num)
+}()
+
+num = 1
+```
+
+指针变量，作为参数传递
+
+```go
+// good case 3
+intMap := make(map[int]int)
+
+// intMap 的修改会被 defer 感知
+// intMap = {"1":1}
+defer func(innerMap map[int]int) {
+    byteArr, _ := json.Marshal(innerMap)
+    fmt.Println("intMap =", string(byteArr))
+}(intMap)
+
+intMap[1] = 1
+```
+
+非指针变量，作为参数传递
+
+```go
+// bad case
+num := 0
+
+// num 的修改不会影响到 innerNum
+// 输出：innerNum = 0
+defer func(innerNum int) {
+    fmt.Println("innerNum =", num)
+}(num)
+
+num = 1
+```
+
+#### recover 机制 
+
+- `recover` 必须和 `panic` 在同一个goroutine中，必须在 `defer func` 中直接调用。
+- `panic` 发生时，当前goroutine会立即中止，执行所有 `defer` 的函数，若 `defer` 函数中没有调用 `recover`，则进程退出。
+- `recover` 只有在 `panic` 所在的栈中调用才会生效，且不能处理其他goroutine发生的 `panic`。
+
+必须在defer函数中直接调用 recover() 才有效
+
+```go
+// good case
+// case 1
+go func() {
+    defer func() {
+        if r := recover(); r != nil {
+            ...
+        }
+    }()
+    panic(1)
+}
+
+// case 2
+func Recover() {
+    if err := recover(); err != nil {
+        ...
+    }
+}
+
+go func() {
+    defer Recover()    //Recover() wrap了一层，展开和case 1是一样的
+    panic(1)
+}
+```
+
+recover直接调用时无效，recover不在defer中，panic后无法调用
+
+```go
+// bad case 1
+go func() {
+    recover()
+    panic(1)
+}
+```
+
+直接defer调用recover也是无效，recover的调用在defer时被展开，不会起作用
+
+```go
+// bad case 2
+go func() {
+    defer recover()
+    panic(1)
+}
+```
+
+defer调用时多层嵌套依然无效，recover在 `defer func` 中被间接调用，defer展开后，recover在 `go func` 的下一层栈上，若发生panic不会传导至recover
+
+```go
+// bad case 3
+go func() {
+    defer func() {
+        func() { 
+            recover() 
+        }()
+    }()
+    panic(1)
+}
+```
+
+`recover` 只有在 `panic` 所在的栈中调用才会生效，且不能处理其他goroutine发生的 `panic`。
+
+- go func1 中执行 go func2，属于2个不同的 goroutine，栈是独立的。
+- 所以 go func1 的 recover 并不能处理 go func2 发生的panic。
+
+
+```go
+// bad case 4
+func main() {
+     go func1()
+     time.Sleep(5 * time.Second)
+}
+
+func func1() {
+     defer func() {
+         if r := recover(); r != nil {
+              fmt.Println("f()")
+              fmt.Println(r)
+         }
+     }()
+     go func2()  
+}
+
+func func2() {
+     panic(1)
+}
+```
