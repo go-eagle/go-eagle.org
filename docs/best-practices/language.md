@@ -764,3 +764,69 @@ func func2() {
      panic(1)
 }
 ```
+
+### channel
+
+#### for+select closed channel会无限循环
+
+- `for + select closed channel` 会无限循环，select break 是不能跳出 for 循环的，只会 select 内的语句有效
+
+```go
+// good case
+func main() {
+     ch := make(chan int)
+     go func() {
+        ch <- 1
+        close(ch)
+     }()
+     
+     Loop:
+         for {
+             select {
+                 case x := <-ch:
+                    fmt.Println(x)
+                 default:
+                    break Loop//结合goto + label
+             }
+         }
+}
+
+// bad case
+func main() {
+     ch := make(chan int)
+     go func() {
+        ch <- 1
+        close(ch)
+     }()
+     
+     for {
+         select {
+             case x := <-ch:    //channel closed还是能接收到零值
+                 ...
+             default:
+                 break         //无法跳出for循环，需要return或结合goto + label
+         }
+     }
+}
+// 程序无法退出，一直跑着 ...
+```
+
+### 原子操作
+
+#### atomic.Value 误用
+
+- `atomic.Value` 使用原则上存入的对象都应该是只读的  
+
+```go
+// bad case
+var v atomic.Value 
+func Test() {
+    p := v.Load().(map[string]int)  //p 是 map 可能会进行并发读写，从而产生panic 
+    value = p[x]  //map读
+    ...
+    p[x] = xxx    //map写
+    v.Store(p) 
+}
+```
+
+### 锁
