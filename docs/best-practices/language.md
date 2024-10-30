@@ -992,7 +992,7 @@ func main() {
 }
 // fatal error: all goroutines are asleep - deadlock!
 
-// bad case 5
+// good case
 // sync.RWMutex 同一个协程内 RLock 重入不会导致死锁
 func main() {
     var m sync.RWMutex
@@ -1009,3 +1009,87 @@ func main() {
 
 ![image](https://github.com/user-attachments/assets/57b75caa-b8cb-489b-ae96-6075dd4d6c6d)
 
+#### copy结构体可能导致非预期的死锁
+
+- copy 结构体时，如果结构体中有锁的话，记得重新初始化一个锁对象，否则会出现非预期的死锁
+
+```go
+type User struct {
+     sync.Mutex
+     name string
+}
+
+func main() {
+     u1 := &User{name: "test"}
+     u1.Lock()
+     defer u1.Unlock()
+     
+     tmp := *u1
+     u2 := &tmp
+     u2.Mutex = sync.Mutex{}  // 如果没有这一行就会死锁，指向同一个锁，重入导致死锁
+     u2.Lock()
+     defer u2.Unlock()
+ }
+```
+
+### 闭包
+
+#### 引用同一个变量
+
+- `for range` 时，v 是一个共享的可访问地址，在每次循环中会对当前元素创建一个副本，并令 v 指向这个副本
+- `for` 循环变量直接被闭包使用，闭包会指向相同的值，会出现“脏读”现象，可以通过 **函数参数传递** 解决
+
+```go
+// good case
+type Person struct {
+    Name string
+    Age  int
+}
+
+func main() {
+    people := []Person{{Name: "Alice", Age: 20}, {Name: "Bob", Age: 25}, {Name: "Charlie", Age: 30}}
+
+    for _, v := range people {
+        // v 是当前元素的副本，修改 v 不会影响原切片中的元素
+        v.Age += 1
+        fmt.Println(v)
+    }
+
+    // 打印原切片，发现元素并没有被修改
+    fmt.Println(people)
+}
+// Output:
+//  {Alice 21}
+//  {Bob 26}
+//  {Charlie 31}
+//  [{Alice 20} {Bob 25} {Charlie 30}]
+
+// good case
+func main() {
+     var wg sync.WaitGroup
+     for i := 0; i < 5; i++ {
+         wg.Add(1)
+         go func(x int) {
+            // recover code ...
+            defer wg.Done()
+            fmt.Println(x)
+         }(i)
+     }
+     wg.Wait()
+}
+
+// bad case
+func main() {
+     var wg sync.WaitGroup
+     for i := 0; i < 5; i++ {
+         wg.Add(1)
+         go func() {
+            // recover code ...
+            defer wg.Done()
+            time.Sleep(1)
+            fmt.Println(i)   //引用同一个外部变量 i，每个协程输出的值都一样
+         }()
+     }
+     wg.Wait()
+}
+```
