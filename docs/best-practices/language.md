@@ -206,6 +206,174 @@ func IsInf(f float64, sign int) bool {
 }
 ```
 
+### for 循环
+
+#### for 循环slice append
+
+for循环中对元素是指针类型的切片(slice) 进行append操作，须确保append对象的指针在for循环被正确更新
+
+```go
+// good case
+func Example() {
+    var pTargetList []*Object  
+    for i := 0; i < 10; i++ {
+        var pObj *Object       
+        pObj = &Object{} 
+        pObj.Index = i
+        targetList = append(targetList, pobj) //append进去的，非同一个指针对象
+    }
+}
+
+// targetList的元素.Index 的输出结果: [0，1，2，3，4，5，6，7，8，9]
+
+// bad case
+func Example() {
+    var targetList []*Object  
+    var pObj *Object 
+    pObj = &Object{}
+    for i := 0; i < 10; i++ {
+        pObj.Index = i  
+        targetList = append(targetList, pobj)   //append进去的，都是同一个指针对象
+    }
+}
+
+// targetList的元素.Index 的输出结果: [9, 9, 9, 9, 9, 9, 9, 9, 9, 9]
+```
+
+### json
+
+#### 反序列化
+
+- json 反序列数字到 `interface{}` 类型的值中时，默认解析为 **float64** 类型，存在精度缺失问题
+- 可以通过使用 `UseNumber` 方法配置，不解析成 `float64`，而是解析成 `json.Number` 类型，再把 `json.Number` 转成 `float64` 或者 `int64`。
+- 推荐使用基础库 [json配置](https://github.com/go-eagle/eagle/blob/master/pkg/utils/string.go#L102），默认使用 `UseNumber` 方法配置
+
+```go
+// good case
+// import (
+	"github.com/go-eagle/eagle/pkg/utils"
+)
+func main() {
+     s := `{"gid":6294332276511651283}`
+     mp := make(map[string]interface{})
+     if err := utils.Json.Unmarshal([]byte(s), &d); err != nil {
+         // do something ...
+     }
+     newStr, err := utils.Json.Marshal(d)
+     if err != nil {
+        // do something ...
+     }
+     fmt.Println(string(s2))
+}
+
+// bad case
+func main() {
+     s := `{"gid":6294332276511651283}`
+     mp := make(map[string]interface{})
+     if err := jsoniter.Unmarshal([]byte(s), &d); err != nil {
+         // do something ...
+     }
+     newStr, err := jsoniter.Marshal(d)
+     if err != nil {
+        // do something ...
+     }
+     fmt.Println(string(s2))   //输出的值不是 6294332276511651283
+}
+```
+
+#### Decode 精度丢失
+
+- Decode 至 `map[string]interface{}` 如果是直接用 unmarshal 原始数据是 int64， 那么会出现精度丢失问题。Decode 源码中，默认用 float64， parseFloat64 会导致 int64 精度丢失。
+- 在使用包含 `interface{}` 的struct来做Json反序列化的时候，由于不知道[]byte的数值是具体的何种数值类型，会将数值全部转成float64类型，如果数值原本的类型的表示范围不被float64包含，则不在float64所包含的数转成float64时会发生精度丢失。
+- 尽量 `unmarshal` 到具体的 model 中，减少 interface 的使用；或者使用 `UseNumber` 方法
+
+```go
+// good case
+type Msg struct {
+     GID int64 `json: "gid"`
+}
+
+func main() {
+     s := `{"gid":6294332276511651283}`
+     var msg Msg
+     if err := json.Unmarshal([]byte(s), &msg); err != nil {
+        // do something ...
+     }
+     fmt.Println(msg.GID)     // 6294332276511651283
+}
+
+// bad case
+func main() {
+     s := `{"gid":6294332276511651283}`
+     mp := make(map[string]interface{})
+     if err := json.Unmarshal([]byte(s), &mp); err != nil {
+         // do something ...
+     }
+     v, ok := mp["gid"].(float64)
+     if ok {
+        fmt.Println(v)         // 6.29433227651165e+18
+     }
+     gid := int64(v) 
+     fmt.Println(gid)          // 6294332276511651283
+}
+```
+
+#### 去除转义字符
+
+- JSON序列化为string字段默认会对 `<`，`>`，`&`，`U+2028` and `U+2029` 进行转义，使用 `\u003c`，`\u003e`，`\u0026`，`\u2028`  and  `\u2029` 进行代替
+- 如果想要禁用转义字符需要调用 `SetEscapeHTML(false)`
+
+
+```go
+// good case
+// 禁用json中的转义字符
+func disableEscapeHtml(data interface{}) (string, error) {
+     bf := bytes.NewBuffer([]byte{})
+     jsonEncoder := json.NewEncoder(bf)
+     jsonEncoder.SetEscapeHTML(false)
+     if err := jsonEncoder.Encode(data); err != nil {
+         return "", err
+     }
+     return bf.String(), nil
+}
+```
+
+#### 反序列化报错未处理
+
+- 在使用 `encoding/json`、`github.com/json-iterator/go` 等包进行反序列化操作时，可能会出现失败，导致业务逻辑使用了model 字段默认值进行判断，出现非预期bug，因此必须对反序列化后返回的error进行判断和处理
+
+```go
+// good case
+type People struct {
+    Name        string `json:"name"`
+    Age         string `json:"age"`
+}
+
+func main() {
+    data := `{"name":"Xiaobai", "age":"20"}`
+    stu := People{}
+    err := json.Unmarshal([]byte(data), &stu)
+    if err!= nil {
+       fmt.Printf("json.Unmarshal err: %v", err)
+       return
+    }
+}
+
+// bad case
+type People struct {
+    Name        string `json:"name"`
+    Age         string `json:"age"`
+}
+
+func main() {
+    data := `{"name":"Xiaobai", "age":"20"}`
+    stu := People{}
+
+    // 这里没有处理错误
+    json.Unmarshal([]byte(data), &stu)
+}
+```
+
 ### Goroutine
 
 #### 优雅退出
