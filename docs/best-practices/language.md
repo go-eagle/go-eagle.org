@@ -63,6 +63,149 @@ if err != nil {
 }
 ```
 
+### 字符串
+
+#### 字符串遍历
+
+当字符串中包含中文等字符（非 ascii 字符）时
+- 使用 `rune` 类型判断字符串长度
+- 使用 `rune` 类型获取其中某个字符
+- 如果追求性能，使用 `utf8.DecodeRuneInString` 效率会更高（但用着比较麻烦），一般将 `string` 转换成 `[]rune` 即可
+
+```go
+// good case 1
+// 通过 utf8.DecodeRuneInString 打印中文字符（性能比string 转换成 []rune好1倍）
+for len(str) > 0 {
+    r, size := utf8.DecodeRuneInString(str)
+    fmt.Println(string(r))
+    str = str[size:]
+}
+// 代码运行示例可以看这里 https://goplay.tools/snippet/At0AkqBYNVs
+
+// good case 2
+// 将 string 直接转换成 []rune
+for _, v := range []rune(str) {
+    fmt.Println(string(v))
+}
+
+// bad case
+// 中文字符串长度与汉字个数不符
+str := "测试" 
+fmt.Println(len(str))  // 输出 6
+fmt.Println(len([]byte(str))) // 输出 6
+```
+
+#### 字符串拼接
+
+- 字符串拼接性能比较 [字符串拼接性能及原理 | Go 语言高性能编程 | 极客兔兔：](https://geektutu.com/post/hpg-string-concat.html)
+  - `strings.Builder` > `bytes.Buffer` > `+` > `fmt.Sprintf`
+- 字符串拼接规则
+  - 涉及 `%` 这类特殊字符符时，使用 `+`
+  - 正常推荐使用 `fmt.Sprintf` （可读性高）
+- `String slice` 字符串拼接可以使用 `strings.Join()`，可读性和性能都会高很多
+
+```go
+func main() {
+     str := "test"
+     path := "docs"
+
+     str1 := "%" + str + "%" // 涉及特殊字符（用 fmt.Sprintf 可读性差）
+     str2 := fmt.Sprintf("go-eagle.org/%s", path) // 常规的字符串拼接
+}
+```
+
+### float
+
+#### float 除0不报错
+
+- float 除0 不报错 结果为 inf，Marshal会报错；int 除0会 panic
+- 除法前都需要前置判断除数是否为0
+
+```go
+// good case
+if postStat.PlayCount > 0 {
+    avgPlayDuration := float64(postStat.TotalDuration) / float64(postStat.PlayCount)
+}
+
+// bad case
+package main
+
+import (
+     "fmt"
+     "encoding/json"
+)
+
+type a struct {
+     F float64
+}
+
+func main() {
+     var fd float64 = 0.0
+     t := &a{F: float64(1)/fd}
+     bs, err := json.Marshal(t)
+     if err != nil {
+         fmt.Println(err) // json: unsupported value: +Inf
+         return
+     }
+     fmt.Println(string(bs))
+}
+```
+
+#### float 比较会有误差
+
+- 浮点数直接比较不稳定可能会有误差，在精度容许范围内使用 `math.Abs` 进行判断
+- https://stackoverflow.com/questions/47969385/go-float-comparison
+
+```go
+// good case
+package main
+
+import (
+     "fmt"
+     "math"
+)
+
+func main() {
+     num := 0.1
+     fmt.Println(math.Abs(num*3-0.3) < 0.01) // true（容忍0.01以下的精度误差）
+}
+
+// bad case
+func main() {
+     num := 0.1
+     num2 := 0.3
+        
+     fmt.Println(num*3 == 0.3)        // false
+     fmt.Println(num+num+num == 0.3)  // false
+     fmt.Println(num+num+num == num2) // false
+     fmt.Println(num+num+num-0.3 > 0) // true
+     fmt.Println(num+num+num-0.3 < 0) // false
+        
+     fmt.Println(0.1+0.1+0.1 == 0.3)  // true
+     fmt.Println(num+num == 0.2)      // true
+}
+```
+
+#### float 范围判断
+
+- `math.IsInf(v,0)` 可以同时判断正负 `Inf`
+- 浮点数的使用要谨慎，要注意 `Inf` 和 `Nan` 的判断，这两个值json序列化时都会报错 [https://goplay.tools/snippet/abTBcOCrHSi](https://goplay.tools/snippet/abTBcOCrHSi)
+
+```go
+// 源码 src/math/bits.go
+// IsInf reports whether f is an infinity, according to sign.
+// If sign > 0, IsInf reports whether f is positive infinity.
+// If sign < 0, IsInf reports whether f is negative infinity.
+// If sign == 0, IsInf reports whether f is either infinity.
+func IsInf(f float64, sign int) bool {
+	// Test for infinity by comparing against maximum float.
+	// To avoid the floating-point hardware, could use:
+	//	x := Float64bits(f);
+	//	return sign >= 0 && x == uvinf || sign <= 0 && x == uvneginf;
+	return sign >= 0 && f > MaxFloat64 || sign <= 0 && f < -MaxFloat64
+}
+```
+
 ### Goroutine
 
 #### 优雅退出
