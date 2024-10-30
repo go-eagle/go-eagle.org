@@ -830,3 +830,182 @@ func Test() {
 ```
 
 ### 锁
+
+- 使用锁的一些最佳实践
+  - 不要嵌套加锁，运行时离开当前逻辑就释放锁，`defer` 保证锁在函数结束后能正确释放
+  - 锁的粒度越小越好，加锁后尽快释放锁。如果锁的临界区太大，有太多非必要操作都进了临界区会大大影响程序性能。 特别是当程序处理比较重的 `I/O` 操作时比较费时，将整个 `I/O` 处理过程写在临界区会导致程序性能大大降低。所以在使用 `defer mu.Unlock()` 确保锁能正确释放的同时也要注意是否能手动管理锁的释放，降低临界区。
+  - 调用多个需要读锁的函数时，在调用的上层函数中加锁和释放，不要在每个函数中加锁和释放。
+- `sync/atomic` 提供了许多原子操作，使用无锁操作不触发调度、不阻塞执行流，执行效率大大提高。
+
+#### 锁复制失效
+
+- 由于Go的函数调用都是值传递，函数传递 `sync.Mutex` 或 `sync.RWMutex` 需要使用锁的指针，否则会因为值传递生成一个新的 `mutex`，原先的锁就失效了。
+- 所以如果要使用同一个锁进行加锁可以使用传递指针的形式
+
+```go
+// good case
+func Worker(m *sync.Mutex){
+    m.Lock()
+    defer m.Unlock()
+    .... // do something
+}
+
+func main(){
+    var mu sync.Mutex
+    go Worker(&mu)
+    go Worker(&mu)
+    time.Sleep(time.Second)
+}
+
+// bad case
+// mutex 对象作为参数，会由于传值而发生拷贝，所以会生成新的Mutex，导致无法正确的加锁
+func Worker(m sync.Mutex){
+    m.Lock()
+    defer m.Unlock()
+    .... // do something
+}
+
+func main(){
+    var mu sync.Mutex
+    go Worker(mu)
+    go Worker(mu)
+    time.Sleep(time.Second)
+}
+```
+
+#### 重入导致死锁 
+
+- `sync.Mutex` **同一个协程内** Lock 锁不可重入，会导致死锁。因为Go中的锁是不可重入锁（非递归锁），所以没法两次加锁。至于为什么Go不实现递归锁，可以看[相关讨论](https://stackoverflow.com/questions/14670979/recursive-locking-in-go#14671462)。
+- `sync.RWMutex` 是Go提供的读写锁，可以加多个读锁或者一个写锁，常用于读次数远远多于写次数的场景。**同一个协程内** Lock 锁不可重入，会导致死锁，只有 RLock 可重入。
+
+```go
+// good case
+// 通过改写释放锁在处理流程中的位置，就可以保证协程B在获取写锁时第一次读锁能够及时释放，这样当写锁释放后，第二次读锁就可以正常获取了。
+
+func main() {
+        var l = sync.RWMutex{}
+        var wg sync.WaitGroup
+        c := make(chan int)
+        
+        // 协程A
+        wg.Add(1)
+        go func() {
+                // 第一次获取读锁
+                l.RLock()
+                c <- 1
+                l.RUnlock()
+                // 让协程B执行
+                runtime.Gosched()
+                // 第二次获取读锁
+                l.RLock()
+                wg.Done()
+                l.RUnlock()
+        }()
+        
+        // 协程B
+        wg.Add(1)
+        go func() {
+                <-c
+                l.Lock()
+                defer l.Unlock()
+                wg.Done()
+        }()
+
+        wg.Wait()
+}
+
+// bad case 1（死锁）
+// 在协程A中首先获取读锁，然后写入chan，协程B从chan读取，获取写锁，由于之前有读锁未释放，所以协程B会等待，此时协程A中第二次获取读锁时，发现有写锁获取中，所以需要等待写锁释放后，才能获取成功（读锁获取的条件，可以参考RLock源码分析）。此时协程A等待协程B写锁释放，而协程B等待协程A第一次读锁释放，此时就形成了死锁。
+// 常常第二次获取读锁可能被封装在另一个函数中被调用，容易被忽视，但是死锁的原理是一样的。
+
+func main() {
+        var l = sync.RWMutex{}
+        var wg sync.WaitGroup
+        c := make(chan int)
+        
+        // 协程A
+        wg.Add(1)
+        go func() {
+                // 第一次获取读锁
+                l.RLock()
+                // 第一个defer
+                defer l.RUnlock()
+                c <- 1
+                // 让协程B执行
+                runtime.Gosched()
+                // 第二次获取读锁
+                l.RLock()
+                // 第二个defer
+                defer l.RUnlock()
+                wg.Done()
+        }()
+        
+        // 协程B
+        wg.Add(1)
+        go func() {
+                <-c
+                l.Lock()
+                defer l.Unlock()
+                wg.Done()
+        }()
+
+        wg.Wait()
+}
+// fatal error: all goroutines are asleep - deadlock!
+
+// bad case 2
+// sync.Mutex 同一个协程内 Lock 重入导致死锁
+func main(){
+    var m sync.Mutex
+    
+    m.Lock()
+    defer m.Unlock()
+    
+    m.Lock()
+    defer m.Unlock()
+}
+// fatal error: all goroutines are asleep - deadlock!
+
+// bad case 3
+// sync.RWMutex 同一个协程内 Lock 重入导致死锁
+func main() {
+    var m sync.RWMutex
+    
+    m.Lock()
+    defer m.Unlock()
+    
+    m.Lock()
+    defer m.Unlock()
+}
+// fatal error: all goroutines are asleep - deadlock!
+
+// bad case 4
+// sync.RWMutex 同一个协程内 Lock/RLock 重入导致死锁
+func main() {
+    var m sync.RWMutex
+    
+    m.Lock()
+    defer m.Unlock()
+    
+    m.RLock()
+    defer m.RUnlock()
+}
+// fatal error: all goroutines are asleep - deadlock!
+
+// bad case 5
+// sync.RWMutex 同一个协程内 RLock 重入不会导致死锁
+func main() {
+    var m sync.RWMutex
+    
+    m.RLock()
+    defer m.RUnlock()
+    
+    m.RLock()
+    defer m.RUnlock()
+}
+```
+
+死锁说明见下图：
+
+![image](https://github.com/user-attachments/assets/57b75caa-b8cb-489b-ae96-6075dd4d6c6d)
+
