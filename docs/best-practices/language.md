@@ -996,6 +996,93 @@ func main() {
 // panic: interface conversion: interface {} is string, not int
 ```
 
+### context
+
+#### sync/errgroup 误用返回的ctx导致后续错误
+
+```go
+// good case
+// 使用新的变量存储errgroup.WithContext返回的ctx，在g.Go内使用新变量
+func (s *userService) DoSomething(ctx context.Context, userID) error {
+    var data1 []int64
+    var data2 []int64
+
+    // 返回的ctx覆盖传入的ctx
+    g, cancelCtx := errgroup.WithContext(ctx) 
+    g.Go(func() error {
+       var err1 error
+       data1, err1 = s.do1(cancelCtx, userID)
+       if err1 != nil {
+          return err1
+       }
+       return nil
+    })
+    g.Go(func() error {
+       var err2 error
+       data2, err2 = s.do2(cancelCtx, userID)
+       if err2 != nil {
+          return err2
+       }
+       return nil
+    })
+
+    // g.Go返回错误或者g.Wait返回的时候，ctx 被 canceled
+    err := g.Wait() 
+    if err != nil {
+       return errors.WithStack(err)
+    }
+
+    return nil
+}
+
+// bad case
+func (s *userService) DoSomething(ctx context.Context, userID) error {
+    var data1 []int64
+    var data2 []int64
+
+    // 返回的ctx覆盖传入的ctx
+    g, ctx := errgroup.WithContext(ctx) 
+    g.Go(func() error {
+       var err1 error
+       data1, err1 = s.do1(ctx, userID)
+       if err1 != nil {
+          return err1
+       }
+       return nil
+    })
+    g.Go(func() error {
+       var err2 error
+       data2, err2 = s.do2(ctx, userID)
+       if err2 != nil {
+          return err2
+       }
+       return nil
+    })
+
+    // g.Go返回错误或者g.Wait返回的时候，ctx 被 canceled
+    err := g.Wait() 
+    if err != nil {
+       return errors.WithStack(err)
+    }
+
+    return nil
+}
+```
+`WithContext` 源码如下
+
+```go
+// https://cs.opensource.google/go/x/sync/+/master:errgroup/errgroup.go
+// WithContext returns a new Group and an associated Context derived from ctx.
+//
+// The derived Context is canceled the first time a function passed to Go
+// returns a non-nil error or the first time Wait returns, whichever occurs
+// first.
+func WithContext(ctx context.Context) (*Group, context.Context) {
+	ctx, cancel := withCancelCause(ctx)
+	return &Group{cancel: cancel}, ctx
+}
+```
+
 ### defer
 
 #### defer 参数传递
