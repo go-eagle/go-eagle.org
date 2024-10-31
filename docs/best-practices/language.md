@@ -1085,6 +1085,19 @@ func WithContext(ctx context.Context) (*Group, context.Context) {
 
 ### defer
 
+#### 执行循序为LIFO
+
+- defer 执行循序为LIFO，参数的值在defer语句执行时就已经确定
+
+```go
+for i := 0; i < 5; i++ {
+    defer fmt.Printf("%d ", i)
+}
+
+// Output:
+4 3 2 1 0 
+```
+
 #### defer 参数传递
 
 - 如果希望后续对变量的修改可以在 defer 中生效，让 defer 引用这个外部变量，而不是作为参数传入。特别的，如果传入的参数是**指针**、 **slice**、**map**，对这些变量的修改会影响原有变量
