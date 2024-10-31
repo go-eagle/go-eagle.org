@@ -278,3 +278,199 @@ if lastUpdateTime == 0 {
         log.Infof("incr sync suc, syncData size=%d originData size=%d count=%d lastUpdateTime=%v", len(syncData), len(s.data), count, lastUpdateTime)
 }
 ```
+
+### 锁的最佳实践
+
+- 减少持有时间
+- 优化锁的粒度
+- 读写分离
+- 使用原子操作
+
+#### 减少持有时间
+
+- 尽量减少锁的持有时间，毕竟使用锁是有代价的，通过减少锁的持有时间来减轻这个代价
+- 不要在持有锁的时候做 IO 操作，尽量只通过持有锁来保护 IO 操作需要的资源而不是 IO 操作本身
+
+```go
+// good case
+func doSomething() {
+    ...
+    m.Lock()     // 加锁
+    ...          // 数据保护
+    m.Unlock()   // 释放锁
+    // 以下是有IO操作的代码
+    http.Get()
+}
+
+// bad case
+func doSomething() {
+    ...
+    m.Lock()    // 加锁
+    ...
+    http.Get()  // 各种耗时的 IO 操作
+    m.Unlock()  // 释放锁
+}
+```
+
+#### 善用 defer 
+
+- 善用 defer 来确保在函数内正确释放了锁，通过 defer 可以确保不会遗漏释放锁操作，避免出现死锁问题，以及避免函数内非预期的 panic 导致死锁的问题。
+- 不过使用 defer 的时候也要注意 `defer m.Unlock()` 可能会导致在持有锁的时候做了 IO 操作，出现了非预期的持有锁时间太长的问题。
+
+```go
+// good case
+func doSomething() error {
+    m.Lock()
+    defer m.Unlock()
+
+    err := ...
+    if err != nil {
+        return err
+    }
+
+    err = ...
+    if err != nil {
+        return err
+    }
+
+    ...
+    return nil
+}
+
+// bad case
+// 非预期的在持有锁期间做 IO 操作
+func doSomething() {
+    m.Lock()
+    defer m.Unlock()
+    
+    item := ...
+    http.Get()   // 各种耗时的 IO 操作
+}
+```
+
+#### 优化锁的粒度
+
+- 细化锁的粒度，通过细化锁的粒度来减少锁的持有时间以及避免在持有锁操作的时候做各种耗时的操作。
+- 最常用的方式就是使用分段锁，通过空间换时间来优化锁的粒度提升性能。
+
+![分段锁](https://github.com/user-attachments/assets/365e74e6-68c0-4f60-8873-89773d56a108)
+
+```go
+// good case
+// 通过内部封装128个锁，只要并发不超过128，都不会存在锁的竞争
+type SafeRander struct {
+    pos     uint32
+    randers [128]*rand.Rand
+    locks   [128]*sync.Mutex
+}
+
+func (sr *SafeRander) Intn(n int) int {
+    x := atomic.AddUint32(&sr.pos, 1)
+    x %= 128
+    sr.locks[x].Lock()
+    n = sr.randers[x].Intn(n)
+    sr.locks[x].Unlock()
+    return n
+}
+
+// bad case
+// globalRand 是全局持有一个锁，这样就会导致所有执行 rand 函数的地方会去竞争同一个锁，可能会导致性能降低，提升性能的方式是可以使用分段锁的方式
+var globalRand = New(&lockedSource{
+    src: NewSource(1).(Source64),
+})
+
+type lockedSource struct {
+    lk sync.Mutex
+    src Source64
+}
+```
+
+#### 读写分离
+
+- 当确定操作不会修改保护的资源时，可以使用 RWMutex 来减少锁等待时间，使用读写锁比单纯使用普通锁的性能更好，效率更高
+
+```go
+// good case
+// 读操作用 RLock
+func GetName() string {
+    rw.RLock()
+    defer rw.RUnlock()
+
+    return name
+}
+
+// 写操作用 Lock
+func SetName(s string) string {
+    rw.Lock()
+    defer rw.Unlock()
+
+    name = s
+}
+```
+
+#### 使用原子操作
+
+- 相比读写锁，使用原子操作具有更高的性能，因为原子操作不会触发 Go 的调度，也不会阻塞执行流，可以使用 Golang 的 `sync/atomic` 包中的提供的方法
+
+```go
+// good case
+type AtomicCounter struct {
+    count int32
+}
+
+func (c *AtomicCounter) Count() {
+    atomic.AddInt32(&c.count, 1)
+}
+
+func (c *AtomicCounter) Read() {
+    _ = atomic.LoadInt32(&c.count)
+}
+```
+
+### 简单并发库
+
+#### 并发限制
+
+- 并发限制优先使用此组件库 [gopool](https://github.com/bytedance/gopkg/blob/main/util/gopool/pool.go)
+- 如果不考虑性能也可以采用开源库 [SizedWaitGroup](https://remy.io/blog/sized-wait-group/)
+
+```go
+// case 1
+// https://github.com/bytedance/gopkg/blob/main/util/gopool/pool_test.go
+func TestPool(t *testing.T) {
+     p := NewPool("test", 100, NewConfig())
+     var n int32
+     var wg sync.WaitGroup
+     for i := 0; i < 2000; i++ {
+         wg.Add(1)
+         p.Go(func() {
+             defer wg.Done()
+             atomic.AddInt32(&n, 1)
+         })
+     }
+     wg.Wait()
+     if n != 2000 {
+        t.Error(n)
+     }
+}
+
+// case 2
+// https://remy.io/blog/sized-wait-group/
+func main() {
+     rand.Seed(time.Now().UnixNano())
+
+     // Typical use-case:
+     // 50 queries must be executed as quick as possible
+     // but without overloading the database, so only
+     // 8 routines should be started concurrently.
+     swg := sizedwaitgroup.New(8)
+     for i := 0; i < 50; i++ {
+         swg.Add()
+         go func() {
+            defer swg.Done()
+            query()
+         }()
+     } 
+     swg.Wait()
+}
+```
