@@ -239,3 +239,42 @@ func main(){
 }
 ```
 
+## 高并发
+
+### 加锁避免io相关操作
+
+- 加锁内部代码块不应该IO操作，会有死锁风险
+
+```go
+// good case
+s.lock.Lock()
+if lastUpdateTime == 0 {
+        s.data = syncData
+        s.lastFullSyncTime = now
+} else {
+        s.incrSetCache(syncData, s.data)
+}
+
+if maxTime > s.lastUpdateTime {
+        s.lastUpdateTime = maxTime
+}
+s.lock.Unlock()
+
+// 独立打印日志减少写锁范围
+if lastUpdateTime == 0 {
+        log.Infof("full sync suc, syncData size=%d lastFullSyncTime=%v", count, now)
+} else {
+        log.Infof("incr sync suc, syncData size=%d originData size=%d count=%d lastUpdateTime=%v", len(syncData), len(s.data), count, lastUpdateTime)
+}
+
+// bad case
+s.lock.Lock()
+defer s.lock.Unlock()
+
+if lastUpdateTime == 0 {
+	// 写日式有io操作 或者 比如操作http、redis、db之类的
+        log.Infof("full sync suc, syncData size=%d lastFullSyncTime=%v", count, now)
+} else {
+        log.Infof("incr sync suc, syncData size=%d originData size=%d count=%d lastUpdateTime=%v", len(syncData), len(s.data), count, lastUpdateTime)
+}
+```
