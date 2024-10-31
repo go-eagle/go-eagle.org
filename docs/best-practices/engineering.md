@@ -161,3 +161,81 @@ demo-http/internal/handler.Hello(0x14000226900) // 3. 报错的方法
 ```
 
 ### client 初始化报错处理
+
+- client 初始化报 err，应该立刻 panic，而不是忽略错误继续业务逻辑
+
+```go
+package main
+
+import (
+    "gorm.io/driver/mysql"
+    "gorm.io/gorm"
+)
+
+func initDB() *gorm.DB {
+    dsn := "user:password@tcp(127.0.0.1:3306)/dbname?charset=utf8mb4&parseTime=True&loc=Local"
+    db, err := gorm.Open(mysql.Open(dsn), &gorm.Config{})
+    if err!= nil {
+        panic(err)
+    }
+    return db
+}
+
+func main() {
+    db := initDB()
+    // 这里可以使用 db 进行数据库操作
+}
+```
+
+### 常用组件error判断
+
+#### MySQL GORM 的 ErrRecordNotFound
+
+- Gorm v2中，只有 First()、Last() 、Take() 三个方法可能返回这个错误https://gorm.io/docs/query.html#Retrieving-a-single-object
+
+```go
+func GetUser(name string) (*model.User, error)
+     res, err := db.Where("name = ?", name).Find(&users)
+     if err != nil && errors.Is(err, &gorm.ErrRecordNotFound) {
+          // do something ...   
+     }
+     return res, nil
+}
+```
+
+#### Redis redis.Nil 错误
+
+```go
+import "github.com/redis/go-redis/v9"
+
+// ...
+res, err := cmd.Result()
+if err != nil && errors.Is(err, redis.Nil) {
+     // do something ...    
+}
+// ...
+```
+
+### 所有协程都要defer处理panic
+
+- 框架只对主进程中发生的 `panic` 兜底，如果是业务中拉取的协程，都要自行处理 `recover`，否则可能因为 `panic` 无兜底打挂整个服务
+
+```go
+// good case
+func main(){
+    go func(){
+        defer func(){
+            if err = recover(); err != nil{
+                // 处理协程内的panic
+            }
+        }()
+        foo() // 异步业务逻辑
+    }
+}
+
+// bad case
+func main(){
+    go foo() 
+}
+```
+
