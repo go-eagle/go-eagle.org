@@ -6,6 +6,10 @@
 
 #### 变量遮蔽(Shadowing)
 
+- 如无必要，嵌套块中的变量声明尽量不要重名，使用赋值而不是覆盖的形式
+- 引申阅读：[Golang变量遮蔽--Shadowing](https://studygolang.com/articles/34007)
+
+
 在golang中，我们经常会用 `:=` 来声明变量，这很方便但也会带来一些问题。当变量遇到作用域时就容易产生shadowing  
 比如说我们经常会遇到的：
 
@@ -60,6 +64,50 @@ if err != nil {
     // 推荐改为：err := operator3()
     
     // 如果你的err逻辑没有在此处return，那么一定要注意下面if外的代码对外部err的赋值问题
+}
+```
+
+### 函数
+
+#### 参数传递都是值传递
+
+- Go 语言函数参数传递都是 `值传递`，无论是 int,string,bool,array 这样的内置类型，还是 slice,channel,map 这样的复杂类型，在函数间传递变量时，都是以值的方式传递。可以理解成Go总是创建一个副本按值转递，只不过这个副本有时候是变量的副本，有时候是变量指针的副本。
+- [slice 本质是一个 struct](https://halfrost.com/go_slice/) 做为参数传递的时候是创建了一个新的 struct，函数内部对slice的修改可能会不生效，建议有修改 总是 返回一个「新的 slice 」给调用方
+- [map 本质也是一个 struct 指针](https://github.com/golang/go/blob/master/src/runtime/map.go#L115) 做为参数传递的时候是创建了一个新的 struct 指针，所以能够在函数内部直接修改它的值
+
+```go
+// bad case 1
+// 在函数调用参数中，数组是值传递，无法通过修改数组类型的参数返回结果
+func main() {
+     x := [3]int{1, 2, 3}
+     func(arr [3]int) {
+         arr[0] = 7
+         fmt.Println(arr)   // [7 2 3]
+     }(x)
+     fmt.Println(x)  // [1 2 3]
+}
+
+// bad case 2
+// 在函数调用参数中，slice也是值传递，在 test 函数内 arr 和 main 函数的 arr 不是同一个slice，所以需要通过 return 返回 slice，main 函数才能感知到值的变化
+func main() {
+     var arr []int
+     for i := 0; i < 3; i++ {
+         arr = append(arr, i) 
+     }
+     test(arr)
+     fmt.Println(arr)    //arr len是3，实际是 [1024 1 2] 
+}
+
+func test(arr []int) {
+    arr = append(arr, 2048)  //arr len是4，实际是[1024, 1, 2, 2048] 
+    arr[0] = 1024
+    fmt.Println(arr) 
+}
+
+func test2(arr []int) {
+    arr = append(arr, 2048, 3, ...)  //如果是 Append 2个以上的元素，cap超过了4，扩容为8(slice扩容机制在量级小的时候翻倍）。当前slice内容先复制到一个新的地址空间再append，所以不影响原有的slice，main 里面的arr就不是[1024 1 2] 而是 [0 1 2] 
+    arr[0] = 1024
+    fmt.Println(arr) 
 }
 ```
 
