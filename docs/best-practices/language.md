@@ -374,6 +374,41 @@ func main() {
 }
 ```
 
+### time
+
+#### time.AddDate 使用
+
+golang 自带的 AddDate 方法在使用时可能不符合我们通常的认知，当我们使用 AddDate 时，实际上做了这些事
+
+1. Go 帮我们简单直接的在对应的日期单位上加对应数字
+`2021-08-31` 执行 `AddDate(0, 1, 0)` 后实际上先变成了 `2021-09-31`
+`2020-02-29` 执行 `AddDate(1, 0, 0)` 后实际上先变成了 `2021-02-29`
+2. 再将这个计算为实际存在的日期
+`2021-09-31`，因为 9 月没有 31 天，因此往后顺延一天，即最终为 `2021-10-01`
+`2021-02-29`，21 年不是闰年，因此也往后顺延一天，即最终为 `2021-03-01`
+3. 已经在 `eagle/pkg/utils` 中新增了 `AddDate()` 函数，可以帮我们实现 **通常认知上的时间加减操作**，如 `2020-01-31 + 0000-01-00 = 2020-02-29`
+
+```go
+// good case
+import ( 
+    "fmt" 
+    "time" 
+    
+    "github.com/go-eagle/eagle/pkg/utils" 
+) 
+
+func main() { 
+     today, _ := time.ParseInLocation("2006-01-02", "2021-08-31", time.Local) 
+     afterOneMonth := utils.AddDate(today, 0, 1, 0) 
+     fmt.Println(afterOneMonth.Format("2006-01-02")) // 输出 2021-09-30 
+     
+     today, _ := time.ParseInLocation("2006-01-02", "2020-02-29", time.Local) 
+     afterOneMonth := utils.AddDate(today, 1, 0, 0) 
+     fmt.Println(afterOneMonth.Format("2006-01-02")) // 输出 2021-02-28 
+}
+```
+
+
 ### Goroutine
 
 #### 优雅退出
