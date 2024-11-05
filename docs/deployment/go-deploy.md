@@ -509,3 +509,4 @@ vim ~/.config/nvim/coc-settings.json
 - [https://ctrlpvim.github.io/ctrlp.vim/](https://ctrlpvim.github.io/ctrlp.vim/)
 - [https://github.com/ctrlpvim/ctrlp.vim](https://github.com/ctrlpvim/ctrlp.vim)
 - [https://wklken.me/posts/2015/06/07/vim-plugin-ctrlp.html](https://wklken.me/posts/2015/06/07/vim-plugin-ctrlp.html)
+- protobuf使用最佳实践：https://protobuf.dev/programming-guides/dos-donts/
