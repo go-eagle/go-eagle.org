@@ -126,15 +126,20 @@ EOF
 ### 安装 protoc 编译器
 
 ```bash
+// macOS or linux
 $ PB_REL="https://github.com/protocolbuffers/protobuf/releases"
 # 如果是macOS 可以改为 osx
 $ OS="linux"
 $ VERSION="3.18.1"
 $ curl -LO $PB_REL/download/v$VERSION/protoc-$VERSION-$OS-x86_64.zip
-
 $ unzip protoc-$VERSION-$OS-x86_64.zip -d /usr/local
+$ echo 'export PATH="$PATH:/usr/local/bin"' >> ~/.bashrc
+source ~/.bashrc
 
-$ export PATH="$PATH:/usr/local/bin"
+// macOS
+brew install protobuf@3 // 会安装3的最新版本 libprotoc 3.20.3
+echo 'export PATH="/opt/homebrew/opt/protobuf@3/bin:$PATH"' >> ~/.bashrc
+source ~/.bashrc
 ```
 
 查看版本
