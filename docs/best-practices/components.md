@@ -14,7 +14,13 @@
 
 - gorm每个方法调用后换行，看着比较清晰
 
-TODO: 补充demo
+```go
+user := query.User
+users, err := user.WithContext(ctx).
+	Select(user.ID, user.Username, user.Age).
+	Where(user.ID.Eq(uid)).
+	Find()
+```
 
 ### SQL列表查询优先使用in关键字
 
