@@ -582,5 +582,155 @@ mock 库
 
 ```go
 // case
+// 基于 mockey + convey 的单测示例
+// mockey 可以使得 Mock 在 PatchConvey 内部生效，外部自动释放。
+mockey.PatchConvey("test case", t, func() {
+    mockey.PatchConvey("测试 return 1", func() {
+        // mock 仅对区域生效
+        mockey.Mock(Fun).Return("1").Build()
+	convey.So(Fun(""), ShouldEqual, "1")
+    })
 
+    mockey.PatchConvey("测试 return 2", func() {
+        // 覆盖 mock，仅对区域有效
+        mockey.Mock(Fun).Return("2").Build()
+        convey.So(Fun(""), ShouldEqual, "2")
+    })
+
+    mockey.PatchConvey("测试 return 3", func() {
+        // 覆盖 mock，仅对区域有效
+        mockey.Mock(Fun).Return("3").Build()
+        convey.So(Fun(""), ShouldEqual, "3")
+    })
+    
+})
+// 这里没有 mock 生效，均已被自动 Un Patch
+convey.So(Fun(""), ShouldEqual, "")
+```
+
+### 测试代码组织
+
+测试代码常见组织模式有 `Arrange-Act-Assert` 和 `Given-When-Then` 两种，在 Go 语言工程实践中推荐 `Arrange-Act-Assert（AAA）` 作为测试代码组织模式，它将单元测试分为三个阶段：
+- `Arrange（准备）`：设置测试的前提条件，包括创建对象、设置依赖关系、定义输入、MOCK 等。
+- `Act（操作）`：执行要测试的行为，通常是调用一个函数或一个方法，并获取其返回值。
+- `Assert（断言）`：验证测试的结果，通常是检查返回值或对象的状态，以确保它们符合预期。
+
+```go
+func TestParseGender(t *testing.T){
+    mockey.PatchConvey("18 位身份证号女性", t, func(){
+        // Arrange: 输入和预期的输出
+        cardNo :="120100201802013691"
+        expectGender := GenderFemale
+        // Act: 调用被测函数
+        resultGender := ParseGender(cardNo)
+        // Assert: 检查结果是否符合预期
+        convey.So(resultGender, convey.ShouldEqual, expectGender)
+    })
+    mockey.PatchConvey("18 位身份证号男性", t, func() {
+	// ...
+    })
+}
+```
+
+#### Arrange-Act-Assert
+
+```go
+// case 1
+// 计算两个数字之和的函数测试
+package main
+
+import "testing"
+
+func addNumbers(a, b int) int {
+    return a + b
+}
+
+func TestAddNumbers(t *testing.T) {
+    // Arrange
+    a := 3
+    b := 5
+    expected := 8
+    // Act
+    result := addNumbers(a, b)
+    // Assert
+    if result!= expected {
+       t.Errorf("addNumbers(%d, %d) = %d; expected %d", a, b, result, expected)
+    }
+}
+
+// case 2
+// 判断字符串是否包含特定子串的函数测试
+package main
+
+import "testing"
+
+func containsSubstring(str, substr string) bool {
+    return len(str) > len(substr) && str[len(str)-len(substr):] == substr
+}
+
+func TestContainsSubstring(t *testing.T) {
+    // Arrange
+    str := "Hello, world!"
+    substr := "world"
+    expected := true
+    // Act
+    result := containsSubstring(str, substr)
+    // Assert
+    if result!= expected {
+       t.Errorf("containsSubstring(%s, %s) = %t; expected %t", str, substr, result, expected)
+    }
+}
+```
+
+#### Given-When-Then
+
+```go
+// case 1
+// 用户登录功能测试
+package main
+
+import "testing"
+
+func login(username, password string) bool {
+    // 假设这里有实际的登录逻辑，检查用户名和密码是否匹配数据库中的用户
+    if username == "testuser" && password == "testpassword" {
+       return true
+    }
+    return false
+}
+
+func TestLogin(t *testing.T) {
+    // Given
+    username := "testuser"
+    password := "testpassword"
+    // When
+    result := login(username, password)
+    // Then
+    if!result {
+       t.Errorf("login(%s, %s) should return true", username, password)
+    }
+}
+
+// case 2
+// 文件读取功能测试
+package main
+
+import "testing"
+
+func readFile(filename string) string {
+    // 假设这里有实际的文件读取逻辑
+    return "Hello, this is a test file."
+}
+
+func TestReadFile(t *testing.T) {
+    // Given
+    filename := "test.txt"
+    expectedContent := "Hello, this is a test file."
+    // When
+    result := readFile(filename)
+    // Then
+    if result!= expectedContent {
+       t.Errorf("readFile(%s) = %s; expected %s", filename, result, expectedContent)
+    }
+}
 ```
