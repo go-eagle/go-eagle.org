@@ -602,6 +602,30 @@ mock 库
 - goconvey，Github 上有 8000 星。开源库，提供丰富的断言功能和断言函数，并支持很多 Web 界面特性，采用函数式编程风格。参考：https://github.com/smartystreets/goconvey
 - testify：Github 上有 21000 星。包含断言、suite、mock（不推荐使用 testify 的 mock），面向对象编程风格。参考：https://github.com/stretchr/testify
 
+一个简单的demo
+
+```go
+import (
+	. "github.com/bytedance/mockey"
+    "github.com/smartystreets/goconvey/convey"
+)
+
+func Fun(a string) string {
+   fmt.Println(a)
+   return a
+}
+
+func TestXXX(t *testing.T) {
+    PatchConvey("test return", t, func() {
+       Mock(Fun).Return("c").Build()
+       r := Fun("a")
+       convey.So(r, convey.ShouldEqual, "c")
+    })
+}
+```
+
+多case情况
+
 ```go
 // case
 // 基于 mockey + convey 的单测示例
