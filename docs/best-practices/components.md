@@ -560,3 +560,27 @@ func UnLock(ctx context.Context, uid int64) {
     return GetClient().Del(key)
 }
 ```
+
+## 单元测试
+
+推荐组合：testing + mockey + goconvey
+
+测试基础框架
+
+- testing，Go 语言官方自带的测试包，按照约定方式编写测试代码后，使用 go test 命令即可执行测试。参考：https://pkg.go.dev/testing
+
+mock 库
+
+- gomock，官方开发维护的测试框架，实现了较为完整的基于 interface 的 mock 功能，能够与 golang 内置的 testing 包良好集成，也能用于其他测试环境中。包含 gomock 包和 mockgen 工具两部分，- - gomock 包完成对桩对象生命周期的管理，mockgen 工具用来生成 interface 对应的 mock 类源文件。参考：https://github.com/golang/mock
+- gomonkey：golang 的一款打桩框架，目标是让用户在单元测试中以低成本完成打桩，从而将精力聚焦于业务功能的开发。参考：https://github.com/agiledragon/gomonkey
+- mockey：mockito 的开源版本，实现思想来自 java 的 mockito，是快速 mock 函数、方便单测的工具库，推荐结合 goconvey 使用。参考：https://github.com/bytedance/mockey
+
+断言库
+
+- goconvey，Github 上有 8000 星。开源库，提供丰富的断言功能和断言函数，并支持很多 Web 界面特性，采用函数式编程风格。参考：https://github.com/smartystreets/goconvey
+- testify：Github 上有 21000 星。包含断言、suite、mock（不推荐使用 testify 的 mock），面向对象编程风格。参考：https://github.com/stretchr/testify
+
+```go
+// case
+
+```
