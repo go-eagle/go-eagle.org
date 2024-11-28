@@ -595,7 +595,7 @@ mock 库
 
 - gomock，官方开发维护的测试框架，实现了较为完整的基于 interface 的 mock 功能，能够与 golang 内置的 testing 包良好集成，也能用于其他测试环境中。包含 gomock 包和 mockgen 工具两部分，- - gomock 包完成对桩对象生命周期的管理，mockgen 工具用来生成 interface 对应的 mock 类源文件。参考：https://github.com/golang/mock
 - gomonkey：golang 的一款打桩框架，目标是让用户在单元测试中以低成本完成打桩，从而将精力聚焦于业务功能的开发。参考：https://github.com/agiledragon/gomonkey
-- mockey：mockito 的开源版本，实现思想来自 java 的 mockito，是快速 mock 函数、方便单测的工具库，推荐结合 goconvey 使用。参考：https://github.com/bytedance/mockey
+- mockey：实现思想来自 java 的 mockito，是快速 mock 函数、方便单测的工具库，推荐结合 goconvey 使用。参考：https://github.com/bytedance/mockey
 
 断言库
 
