@@ -795,3 +795,62 @@ func TestDoSomeThing(t *testing.T) {
 }
 ```
 
+### 表驱动（Table-Driven）
+
+- 只需准备多组数据，无需重复构造流程，代码少冗余少，写得快，结构清晰可读性强，更易扩展和可维护
+
+```go
+package main
+
+import (
+    "testing"
+
+    "github.com/bytedance/mockey"
+    "github.com/smartystreets/goconvey/convey"
+)
+
+/* 被测单元 */
+func Add(x, y int) int {
+    return x + y
+}
+
+/* 单元测试 */
+func TestAddWithDataTable(t *testing.T) {
+    // Arrange：准备输入和预期的输出
+    type inputs struct {
+       a int
+       b int
+    }
+    tests := []struct {
+       name     string
+       args     inputs
+       expected int
+    }{
+       {"0+0", inputs{0, 0}, 0},
+       {"正数和", inputs{1, 2}, 3},
+       {"正负和", inputs{-1, 1}, 0},
+       {"负数和", inputs{-1, -1}, -2},
+    }
+    // 循环遍历，测试各种情况
+    for _, tt := range tests {
+       t.Run(tt.name, func(t *testing.T) {
+          mockey.PatchConvey(tt.name, t, func() {
+             // Act：调用被测函数
+             result := Add(tt.args.a, tt.args.b)
+
+             // Assert：检查结果是否符合预期
+             convey.So(result, convey.ShouldEqual, tt.expected)
+          })
+       })
+    }
+}
+```
+
+1. tests定义测试数据，其中 name 定义了每个测试场景的名称。
+2. 循环中，`t.Run()`执行每一个子测试，每个子测试使用 name 区分，若某个 case 报错，可快速定位和排查。
+3. 该例子中，断言使用 `goconvey` 库中的 `convey.So()` 方法替代了 `t.Errorf()`。
+  1. 特别地，`convey.So()` 必须位于 `convey.PatchConvey()` 中。
+
+注意：Table-Driven 并非所有情况都适用。
+1. 适用范围：针对同一函数或者方法，有众多相似的测试用例需要测试，尤其是输入和输出可以被清晰定义时。比如，对于数学函数、解析函数、格式化函数等的测试。
+2. 不适用范围：当函数行为复杂、数据结构复杂时，每个测试用例可能需要不同的预设条件和断言，或独立的前置设置或后置清理。
