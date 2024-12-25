@@ -43,7 +43,7 @@ const sidebars: SidebarsConfig = {
     {
       type: 'category',
       label: '核心组件',
-      collapsed: false,
+      collapsed: true,
       items: [
         'component/config',
         'component/logging',
@@ -107,7 +107,7 @@ const sidebars: SidebarsConfig = {
     {
       type: 'category',
       label: '环境部署',
-      collapsed: false,
+      collapsed: true,
       items: [
         'deployment/go-deploy',
         'deployment/jaeger-deploy',
@@ -118,7 +118,7 @@ const sidebars: SidebarsConfig = {
     {
       type: 'category',
       label: '开发指南',
-      collapsed: false,
+      collapsed: true,
       items: [
         'guide/api-protobuf',
         'guide/api-restful',
@@ -129,8 +129,18 @@ const sidebars: SidebarsConfig = {
     },
     {
       type: 'category',
+      label: '最佳实践',
+      collapsed: true,
+      items: [
+        'best-practices/components',
+        'best-practices/engineering',
+        'best-practices/language',
+      ],
+    },
+    {
+      type: 'category',
       label: '开源社区',
-      collapsed: false,
+      collapsed: true,
       items: [
         'community/contribution',
         'community/documentation',
