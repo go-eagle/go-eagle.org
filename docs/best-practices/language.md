@@ -9,7 +9,7 @@ keywords:
   - Framework
   - Microservices
   - HTTP
-slug: /best/practices/language
+slug: /best-practices/language
 ---
 
 ## Go 常见的坑
