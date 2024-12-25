@@ -1,4 +1,16 @@
-# 代码最佳实践 - 语言篇
+---
+id: language
+title: 代码最佳实践 - 语言篇 
+description: 代码最佳实践 - 语言篇 
+keywords:
+  - Go
+  - Eagle
+  - Toolkit
+  - Framework
+  - Microservices
+  - HTTP
+slug: /best/practices/language
+---
 
 ## Go 常见的坑
 
