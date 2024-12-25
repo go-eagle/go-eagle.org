@@ -1,4 +1,16 @@
-# 代码最佳实践汇总 - 组件篇
+---
+id: language
+title: 代码最佳实践 - 组件篇
+description: 代码最佳实践 - 组件篇
+keywords:
+  - Go
+  - Eagle
+  - Toolkit
+  - Framework
+  - Microservices
+  - HTTP
+slug: /best-practices/components
+---
 
 ## 配置组件
 
