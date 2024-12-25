@@ -1,4 +1,16 @@
-# 代码最佳实践 - 工程篇
+---
+id: language
+title: 代码最佳实践 - 工程篇 
+description: 代码最佳实践 - 工程篇
+keywords:
+  - Go
+  - Eagle
+  - Toolkit
+  - Framework
+  - Microservices
+  - HTTP
+slug: /best/practices/engineering
+---
 
 ## 项目结构
 
