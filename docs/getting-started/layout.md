@@ -20,14 +20,24 @@ slug: /getting-started/layout
 ├── Makefile                     # 项目管理文件
 ├── README.md                    # 项目说明文件
 ├── api                          # API接口定义，proto源文件及gRPC stub
-├── cmd                          # 项目启动入口文件
+├── cmd                          # 
+│   ├── consumer                 # 消费者服务入口
+│   ├── gen                      # gorm生成数据库脚本
+│   └── server                   # 服务启动入口
 ├── config                       # 配置文件统一存放目录
+│   ├── dev                      # 开发环境配置
+│   ├── docker                   # docker环境配置
+│   ├── prod                     # 生成环境配置
+│   └── test                     # 测试环境配置
 ├── internal                     # 业务目录
-│   ├── cache                    # 基于业务封装的cache
+│   ├── dal                      # 数据访问层
+│   │   ├── cache                # 基于业务封装的cache
+│   │   ├── db                   # 数据库 model 及 使用 gorm/gen 生成的自定义方法
+│   │   ├── init.go              # 用于初始化数据访问层的相关配置和资源
+│   │   └── rpc                  # 存放与远程过程调用（RPC）相关的代码
 │   ├── handler                  # http 接口
 │   ├── middleware               # 业务自定义中间件
-│   ├── model                    # 数据库 model
-│   ├── repository               # 数据访问层, eg: 数据库,redis, 第三发api等
+│   ├── repository               # 数据防腐层，对下和dal层进行交互，对上供service进行调用
 │   ├── ecode                    # 业务自定义错误码
 │   ├── mock                     # mock 文件，用于单元测试
 │   ├── routers                  # 业务路由
@@ -52,16 +62,7 @@ slug: /getting-started/layout
 ├── config                       # 配置文件统一存放目录
 ├── internal                     # 业务目录
 │   ├── user                     # 内部目录结构同单应用模式下的 internal
-│       ├── cache                    # 基于业务封装的cache
-│       ├── handler                  # http 接口
-│       ├── middleware               # 业务自定义中间件
-│       ├── model                    # 数据库 model
-│       ├── repository               # 数据访问层, eg: 数据库,redis,api等
-│       ├── ecode                    # 业务自定义错误码
-│       ├── mock                     # mock 文件，用于单元测试
-│       ├── routers                  # 业务路由
-│       ├── server                   # http server 和 grpc server
-│       └── service                  # 业务逻辑层
+│       ...                      # 说明同单应用模式里的说明
 │   ├── post                     # 同 user
 │   ├── order                    # 同 user
 │   ├── payment                  # 同 user
