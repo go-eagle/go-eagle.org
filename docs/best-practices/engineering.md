@@ -1,5 +1,5 @@
 ---
-id: language
+id: engineering
 title: 代码最佳实践 - 工程篇 
 description: 代码最佳实践 - 工程篇
 keywords:
@@ -9,7 +9,7 @@ keywords:
   - Framework
   - Microservices
   - HTTP
-slug: /best/practices/engineering
+slug: /best-practices/engineering
 ---
 
 ## 项目结构

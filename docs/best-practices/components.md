@@ -1,5 +1,5 @@
 ---
-id: language
+id: components
 title: 代码最佳实践 - 组件篇
 description: 代码最佳实践 - 组件篇
 keywords:
@@ -195,7 +195,7 @@ type Search interface {
 // cmd/gen/generate.go
 ...
 func main() {
-    g := bytedgen.NewGenerator(gen.Config{
+    g := gen.NewGenerator(gen.Config{
         OutPath: "../internal/dal/db/dao",
     })
     g.UseDB(db)
@@ -450,7 +450,7 @@ type IDSearch interface {
 
 // 代码生成
 func main() {
-    g := bytedgen.NewGenerator(gen.Config{
+    g := gen.NewGenerator(gen.Config{
         OutPath: "../internal/db/dal/dao", 
     })
     g.UseDB(db)
