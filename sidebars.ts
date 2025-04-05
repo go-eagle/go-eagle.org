@@ -113,6 +113,8 @@ const sidebars: SidebarsConfig = {
         'deployment/jaeger-deploy',
         'deployment/app-deploy',
         'deployment/aws-eks-deploy',
+        'deployment/install-jenkins',
+        'deployment/use-jenkins-deploy',
       ],
     },
     {

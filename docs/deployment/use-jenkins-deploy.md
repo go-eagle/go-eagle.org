@@ -1,8 +1,21 @@
-
+---
+id: use-jenkins-deploy
+title: 使用 Jenkins 进行部署
+description: 使用 Jenkins部署应用到服务器或k8s
+keywords:
+  - Go
+  - Eagle
+  - Toolkit
+  - Framework
+  - deploy
+  - k8s
+  - jenkins
+slug: /deployment/use-jenkins-deploy
+---
 
 将一个 Go 项目使用 Jenkins 部署到指定的机器上或k8s是一个多步骤的过程，包括配置 Jenkins、编写 shell 或 Jenkinsfile、设置远程机器的环境等。
 
-分别从部署到ECS和k8s, 以下是具体的步骤：
+分别从部署到`ECS`和`k8s`, 以下是具体的步骤：
 
 ## 部署到ECS
 
@@ -18,6 +31,9 @@
 ### 步骤0 ：copy 公钥到目标机器
 
 #### 生成ssh key
+
+下面的命令需要在 Jenkins 所在机器上执行
+
 ```bash
 ssh-keygen -t rsa -b 4096
 ```
@@ -148,6 +164,8 @@ ansible 推荐都是以role模板格式作为playbook来实现非常强大的功
 
 > ansible 官方文档：https://docs.ansible.com/ansible/latest/index.html
 
+以部署 `user-service` 服务为例:
+
 `go-playbook.yaml` 内容如下：
 
 ```yaml
@@ -207,7 +225,7 @@ ansible 推荐都是以role模板格式作为playbook来实现非常强大的功
 
 在 Jenkins 主机上创建一个 Ansible inventory 文件（例如 /path/to/inventory），其中包含目标机器的信息，例如：
 
-Ansible inventory 即 hosts， 配置如下，默认的 Inventory：/etc/ansible/hosts
+Ansible inventory 即 hosts， 配置如下，默认的 Inventory：`/etc/ansible/hosts`
 
 > Inventory文件格式: 最常见的格式是 INI 和 YAML 格式, 常用的是 INI
 
@@ -220,7 +238,6 @@ Ansible inventory 即 hosts， 配置如下，默认的 Inventory：/etc/ansible
 ```
 
 > 注意：这里的 `ansible_python_interpreter` 指的是目标服务器上的python
-
 
 #### 7. 需要在目标服务器上安装python3
 
@@ -241,7 +258,7 @@ sudo ln -sf /usr/bin/python3.9 /usr/bin/python3
 
 ## 部署到 k8s
 
-### 前提条件
+### 部署前准备
 
 1. 找一台机器安装好 Jenkins
 2. 在 Jenkins 机器上 安装 Go
@@ -268,7 +285,7 @@ sudo ln -sf /usr/bin/python3.9 /usr/bin/python3
 
 ### 步骤 2：编写 Jenkinsfile
 
-在 Go 项目的根目录下创建一个 Jenkinsfile，定义 Jenkins Pipeline。以下是一个示例：
+在 Go 项目的根目录下创建一个 `Jenkinsfile`，定义 Jenkins Pipeline。以下是一个示例：
 
 ```groovy
 pipeline {
@@ -411,22 +428,22 @@ def getGitTags() {
 
 ### 步骤 3：配置 Jenkins 凭证
 
-1. 进入 Jenkins 管理界面:
+1.进入 Jenkins 管理界面:
 
 打开你的 Jenkins 服务器的管理界面。
 
-2. 管理 Jenkins 凭证:
-   
+2.管理 Jenkins 凭证:
+
 - 选择 "Manage Jenkins"（管理 Jenkins）。
 - 选择 "Manage Credentials"（管理凭证）。
 
-3. 添加新的凭证:
+3.添加新的凭证:
 
 - 选择适当的凭证存储域（通常是全局域）。
 - 点击 "Add Credentials"（添加凭证）。
 - 添加密码或者 private key 的都可以
   
-4. 添加 Docker Registry 凭证:
+4.添加 Docker Registry 凭证:
 
 - Kind（类型）：选择 "Username with password"。
 - Scope（范围）：选择 "Global"（全局）。
@@ -440,11 +457,11 @@ def getGitTags() {
 
 如果你需要在 Jenkins 中使用 Kubernetes 凭证，可以按照以下步骤操作：
 
-1. 获取 Kubeconfig 文件:
+1.获取 Kubeconfig 文件:
 
 从你的 Kubernetes 集群中获取 Kubeconfig 文件，这个文件通常位于 ~/.kube/config。
 
-2. 在 Jenkins 中配置 Kubeconfig 凭证:
+2.在 Jenkins 中配置 Kubeconfig 凭证:
 
 - 按照上述步骤进入 Jenkins 的 "Manage Credentials" 界面。
 - 添加新的凭证，选择 "Secret file"（秘密文件）。
@@ -477,4 +494,3 @@ def getGitTags() {
 - https://desistdaydream.github.io/docs/9.%E8%BF%90%E7%BB%B4/Ansible/Inventory-%E9%85%8D%E7%BD%AE%E6%96%87%E4%BB%B6%E8%AF%A6%E8%A7%A3/
 - https://www.youtube.com/watch?v=Bgv4C0buCsU
 - https://github.com/webmagicinformatica/hello-webapp-golang/blob/master/Jenkinsfile
-

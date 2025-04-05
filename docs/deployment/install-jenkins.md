@@ -1,3 +1,16 @@
+---
+id: install-jenkins
+title: 安装 Jenkins
+description: 在linux或macos上安装 Jenkins
+keywords:
+  - Go
+  - Eagle
+  - Toolkit
+  - Framework
+  - Microservices
+  - HTTP
+slug: /deployment/install-jenkins
+---
 
 本文主要讲解如何安装 一台可以部署Go服务的 Jenkins 服务器
 
@@ -23,14 +36,16 @@
 
 - Java
 
-#### 安装 Jenkins
+#### Linux上安装 Jenkins
 
 ```bash
 # 安装 java
 sudo wget -O /etc/yum.repos.d/jenkins.repo \
     https://pkg.jenkins.io/redhat-stable/jenkins.repo
+
 sudo rpm --import https://pkg.jenkins.io/redhat-stable/jenkins.io-2023.key
 sudo yum upgrade
+
 # Add required dependencies for the jenkins package
 sudo yum install fontconfig java-17-openjdk
 sudo yum install jenkins
@@ -42,7 +57,7 @@ sudo systemctl enable jenkins
 # 启动 Jenkins 服务
 sudo systemctl start jenkins
 # 查看状态
-sudo systemctl start jenkins
+sudo systemctl status jenkins
 ```
 
 如果配置正确，会看到如下信息
@@ -65,7 +80,7 @@ Active: active (running) since Tue 2023-06-22 16:19:01 +03; 4min 57s ago
 
 这里使用 `brew` 进行安装, 如果没安装可以看这里：https://brew.sh/
 
-#### 安装 Jenkins
+#### macOS上安装 Jenkins
 
 ```bash
 # 安装
@@ -87,7 +102,7 @@ brew services start jenkins
 brew services restart jenkins
 ```
 
-#### 访问 Jenkins
+#### 本地访问 Jenkins
 
 访问地址：`http://localhost:8080`
 
@@ -109,7 +124,6 @@ brew services restart jenkins
 ```bash
 sudo yum install git -y
 ```
-
 
 ### 安装 ansible
 
