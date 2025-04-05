@@ -53,29 +53,19 @@ go get -v github.com/go-eagle/eagle/cmd/eagle
 > Go 1.16 版本以上使用该方式
 
 ```bash
-go install github.com/go-eagle/eagle/cmd/eagle
+go install github.com/go-eagle/eagle/cmd/eagle@latest
 ```
 
 ## 创建项目
 
-### 1. 只包含 http 服务
+默认包含 http 和 gRPC 服务
 
 ```bash
 # 创建新项目
 eagle new eagle-demo 
 
 # 或
-eagle new github.com/foo/eagle-demo 
-```
-
-### 2. 包含 http 和 gRPC 服务
-
-```bash
-# 创建新项目
-eagle new -b=all eagle-demo 
-
-# 或
-eagle new -b=all github.com/foo/eagle-demo 
+eagle new github.com/foo/eagle-demo
 ```
 
 ## 编译和运行
