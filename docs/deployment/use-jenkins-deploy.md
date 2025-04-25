@@ -330,7 +330,7 @@ pipeline {
                 // 检出代码
                 checkout scm:([
                     $class: 'GitSCM',
-                    branches: [[name: "${GIT_TAG}"]],
+                    branches: [[name: "`${GIT_TAG}"`]],
                     userRemoteConfigs: [[
                         url: "${GIT_URL}"
                     ]]
@@ -361,7 +361,7 @@ pipeline {
         stage('Build Docker Image') {
             steps {
                 // 在本地构建 Go 项目
-                def tag = "${GIT_TAG}"
+                def tag = "`${GIT_TAG}`"
                 sh 'make docker'
                 sh "docker build -t ${REGISTRY}/${NAMESPACE}/${IMAGE_NAME}:${tag} ."
             }
@@ -371,7 +371,7 @@ pipeline {
            steps {
                script {
                    withCredentials([usernamePassword(credentialsId: 'DOCKER_REGISTRY_CREDENTIALS_ID', usernameVariable: 'DOCKER_USERNAME', passwordVariable: 'DOCKER_PASSWORD')]) {
-                       def tag = "${GIT_TAG}"
+                       def tag = "`${GIT_TAG}`"
                        sh """
                            echo $DOCKER_PASSWORD | docker login --username $DOCKER_USERNAME --password-stdin ${REGISTRY}
                            docker push ${REGISTRY}/${NAMESPACE}/${IMAGE_NAME}:${tag}
@@ -478,7 +478,7 @@ def getGitTags() {
 2. 在 SCM 选择 Git
 3. 填入仓库地址， Repository URL
 4. 选择访问仓库时的凭证 Credentials
-5. 填写要构建的分支(Branches to build)或tag，比如选择master分支, 则填入 "*/master"，如果是tag,则填入 "${GIT_TAG}"
+5. 填写要构建的分支(Branches to build)或tag，比如选择master分支, 则填入 "*/master"，如果是tag,则填入 "`${GIT_TAG}`"
 6. 指定脚本路径，主要是指 `Jenkinsfile` 的路径，如果在项目根目录下，直接填入 `Jenkinsfile` 即可。
 7. 一定要把 “轻量级检出” 的勾选去掉，否则会报类似错误： `fatal: couldn't find remote ref refs/heads/v1.xx`
 8. 保存并构建项目。
