@@ -1,1 +1,0 @@
-"use strict";(self.webpackChunkgo_eagle_org_3=self.webpackChunkgo_eagle_org_3||[]).push([[7472],{5513:e=>{e.exports=JSON.parse('{"title":"Recent posts","items":[{"title":"Welcome","permalink":"/blog/welcome","unlisted":false},{"title":"Hello","permalink":"/blog/hello-world","unlisted":false},{"title":"Hola","permalink":"/blog/hola","unlisted":false}]}')}}]);
